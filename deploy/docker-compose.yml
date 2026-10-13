@@ -1,0 +1,49 @@
+# VCPeer Send — "Send a link" (WeTransfer-style file transfer), adopted from
+# Pingvin Share X (smp46/pingvin-share-x, BSD-2-Clause), composed and
+# rebranded for vcpeer.com. See deploy/RUNBOOK.md for the full deploy guide.
+#
+# Target: Oracle Ampere ARM64 (aarch64) host, prebuilt multi-arch image
+# (linux/amd64,linux/arm64) pulled from GHCR — no local build needed.
+#
+# Usage:
+#   cd deploy
+#   cp ../.env.example .env        # fill in real secrets
+#   cp config.yaml ./config.yaml   # fill in SMTP/R2/admin placeholders first
+#   docker compose up -d
+#
+# Fronted by this box's existing Caddy or Cloudflare Tunnel at
+# share.vcpeer.com (see RUNBOOK.md for why a subdomain, not a subpath).
+
+services:
+  vcpeer-send:
+    container_name: vcpeer-send
+    image: ghcr.io/smp46/pingvin-share-x:v2.0.0
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3010:3000" # bind to localhost only; Caddy/Tunnel fronts this
+    environment:
+      - TRUST_PROXY=true # behind Caddy / Cloudflare Tunnel
+      - CADDY_DISABLED=false # keep the built-in Caddy (handles frontend+backend routing)
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+    volumes:
+      - vcpeer-send-data:/opt/app/backend/data:rw
+      - vcpeer-send-images:/opt/app/frontend/public/img:rw
+      - ./config.yaml:/opt/app/config.yaml:ro
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-fs",
+          "http://localhost:3000/api/health",
+        ]
+      interval: 30s
+      timeout: 5s
+      start_period: 90s
+      retries: 3
+
+volumes:
+  vcpeer-send-data:
+  vcpeer-send-images:

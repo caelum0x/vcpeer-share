@@ -1,0 +1,155 @@
+# VCPeer Send — production config for the "Send a link" product.
+# Based on config.example.yaml from upstream Pingvin Share X v2.0.0.
+# Mount this file read-only at /opt/app/config.yaml in the container.
+# NOTE: setting values here locks them (can't be changed from /admin/config UI).
+# Fill in the real SMTP/R2 secrets before deploying — these are placeholders.
+
+general:
+  appName: VCPeer Send
+  appUrl: https://share.vcpeer.com
+  showHomePage: "true"
+  showAuthButtons: "true"
+  defaultLanguage: en-US
+
+security:
+  sessionDuration: 3 months
+  secureCookies: "true"
+  enableEmailVerification: "false"
+  allowRegistration: "false"
+  allowUnauthenticatedShares: "true"
+  allowAdminAccessAllShares: "false"
+  customPasswordPolicy: "false"
+  minLength: "8"
+
+appearance:
+  themePrimaryColor: custom
+  themePrimaryColorOverride: "#376DF9"
+  themeRadius: md
+  themeColorScheme: system
+  customCss: ""
+  uploadProgressStyle: circle
+
+share:
+  enableShareEmailRecipients: "true"
+  enableShareDownloadNotifications: "true"
+  enableUserRecipients: "false"
+  autoOpenShareModal: "true"
+  reverseShareSimpleOnly: "false"
+  # Free-tier limits (owner rule): 2 GB per transfer, 7-day expiry default.
+  maxExpiration: 30 days
+  defaultExpiration: 7 days
+  shareIdLength: "8"
+  maxSize: "2000000000"
+  zipCompressionLevel: "6"
+  chunkSize: "10000000"
+  fileRetentionPeriod: 0 days
+
+email:
+  sendHtmlEmails: "true"
+  shareRecipientsReplyToCreator: "true"
+  shareRecipientsSubject: "Files shared with you via VCPeer"
+  shareRecipientsMessage: >-
+    Hey!
+
+
+    {creator} ({creatorEmail}) shared files with you using VCPeer Send. You
+    can view or download them here: {shareUrl}
+
+
+    This share expires {expires}.
+
+
+    Note: {desc}
+
+
+    Sent with VCPeer — send your own files free at https://vcpeer.com/send
+  reverseShareSubject: "Reverse share link used — VCPeer Send"
+  reverseShareMessage: |-
+    Hey {name}!
+
+    A share was just created with your reverse share link: {shareUrl}
+
+    Sent with VCPeer — https://vcpeer.com/send
+  resetPasswordSubject: "VCPeer Send password reset"
+  resetPasswordMessage: >-
+    Hey {name}!
+
+
+    You requested a password reset. Click this link to reset your password:
+    {url}
+
+    The link expires in an hour.
+
+
+    VCPeer — https://vcpeer.com
+  inviteSubject: "You're invited to VCPeer Send"
+  inviteMessage: >-
+    Hey {name}!
+
+
+    You were invited to VCPeer Send. Click this link to accept the invite:
+    {url}
+
+
+    You can use the email "{email}" and the password "{password}" to sign in.
+
+
+    VCPeer — https://vcpeer.com
+  shareDownloadNotificationSubject: "Your file was downloaded — VCPeer Send"
+  shareDownloadNotificationMessage: |-
+    Hey {creator}!
+
+    {recipient} downloaded {fileName} from your share: {shareUrl}
+
+    Sent with VCPeer — https://vcpeer.com/send
+  verificationSubject: "Verify your VCPeer Send account"
+  verificationMessage: >-
+    Hey {name}!
+
+
+    You just signed up for VCPeer Send. Click this link to verify your
+    account: {url}
+
+
+    The link expires in 24 hours.
+
+
+    VCPeer — https://vcpeer.com
+
+smtp:
+  # Scribase Mail SMTP (mail.scribase.com) — fill in real credentials before deploy.
+  enabled: "true"
+  allowUnauthorizedCertificates: "false"
+  host: "mail.scribase.com"
+  port: "587"
+  email: "send@vcpeer.com"
+  username: "REPLACE_WITH_SCRIBASE_MAIL_SMTP_USERNAME"
+  password: "REPLACE_WITH_SCRIBASE_MAIL_SMTP_PASSWORD"
+
+# S3-compatible storage is optional. Default is local disk (see docker-compose.yml
+# volume). Uncomment and fill in to use Cloudflare R2 instead — never AWS.
+s3:
+  enabled: "false"
+  endpoint: "https://REPLACE_WITH_R2_ACCOUNT_ID.r2.cloudflarestorage.com"
+  region: "auto"
+  bucketName: "vcpeer-send"
+  bucketPath: ""
+  key: "REPLACE_WITH_R2_ACCESS_KEY_ID"
+  secret: "REPLACE_WITH_R2_SECRET_ACCESS_KEY"
+  useChecksum: "false"
+
+legal:
+  enabled: "true"
+  imprintUrl: "https://vcpeer.com/imprint"
+  privacyPolicyUrl: "https://vcpeer.com/privacy"
+
+initUser:
+  # Creates the first admin on first boot. Change the password immediately
+  # after first login, then flip this back to false (re-running with
+  # enabled:true does not reset an existing user).
+  enabled: true
+  username: admin
+  email: "REPLACE_WITH_OWNER_EMAIL"
+  password: "REPLACE_BEFORE_DEPLOY_openssl_rand_-base64_24"
+  isAdmin: true
+  ldapDN: ""
