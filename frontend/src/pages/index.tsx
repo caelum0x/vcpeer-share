@@ -166,7 +166,7 @@ export default function Home() {
               </Button>
               <Button
                 component={Link}
-                href="https://github.com/smp46/pingvin-share-x"
+                href="https://github.com/caelum0x/vcpeer-share"
                 target="_blank"
                 variant="default"
                 radius="xl"

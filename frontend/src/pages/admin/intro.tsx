@@ -21,31 +21,23 @@ const Intro = () => {
             <Logo height={80} width={80} />
           </Center>
           <Center>
-            <Title order={2}>Welcome to Pingvin Share X</Title>
+            <Title order={2}>Welcome to VCPeer Send</Title>
           </Center>
           <Text>
-            If you enjoy Pingvin Share X please ⭐️ it on{" "}
-            <Anchor
-              target="_blank"
-              href="https://github.com/smp46/pingvin-share-x"
-            >
-              GitHub
+            Share files with a link or by email — no account needed for
+            recipients. Part of the{" "}
+            <Anchor target="_blank" href="https://vcpeer.com">
+              VCPeer
             </Anchor>{" "}
+            suite.
           </Text>
-          <Text>
-            You can also support development via{" "}
-            <Anchor target="_blank" href="https://github.com/sponsors/smp46">
-              GitHub Sponsors ❤️
-            </Anchor>{" "}
-          </Text>
-          <Text>Enough talked, have fun with Pingvin Share X!</Text>
-          <Text mt="lg">How to you want to continue?</Text>
+          <Text mt="lg">How do you want to continue?</Text>
           <Stack>
             <Button href="/admin/config/general" component={Link}>
               Customize configuration
             </Button>
             <Button href="/" component={Link} variant="light">
-              Explore Pingvin Share X
+              Explore VCPeer Send
             </Button>
           </Stack>
         </Stack>

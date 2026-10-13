@@ -24,7 +24,7 @@ export default {
   "home.description":
     "Do you really want to put your personal files in the hands of third parties like WeTransfer?",
   "home.bullet.a.name": "Self-Hosted",
-  "home.bullet.a.description": "Host Pingvin Share on your own machine.",
+  "home.bullet.a.description": "Host VCPeer Send on your own machine.",
   "home.bullet.b.name": "Privacy",
   "home.bullet.b.description":
     "Your files are yours and will never be accessed by third parties.",
@@ -527,7 +527,7 @@ export default {
   // /admin/config
   "admin.config.config-file-warning.title": "Configuration file present",
   "admin.config.config-file-warning.description":
-    "As you have configured Pingvin Share X with a configuration file, these settings cannot be changed through the UI.",
+    "As you have configured VCPeer Send with a configuration file, these settings cannot be changed through the UI.",
   "admin.config.title": "Configuration",
   "admin.config.category.general": "General",
   "admin.config.category.appearance": "Appearance",
@@ -573,7 +573,7 @@ export default {
     "Percentage and time remaining",
   "admin.config.general.app-url": "App URL",
   "admin.config.general.app-url.description":
-    "URL where Pingvin Share X is available.",
+    "URL where VCPeer Send is available.",
   "admin.config.security.secure-cookies": "Secure cookies",
   "admin.config.security.secure-cookies.description":
     "Whether to set the secure flag on cookies. If enabled, the site will not function when accessed over HTTP.",
@@ -617,7 +617,7 @@ export default {
     "Maximum number of items inside the cache.",
   "admin.config.cache.redis-enabled": "Redis enabled",
   "admin.config.cache.redis-enabled.description":
-    "Pingvin Share X caches data in memory by default. Enable Redis to share the cache across multiple instances.",
+    "VCPeer Send caches data in memory by default. Enable Redis to share the cache across multiple instances.",
   "admin.config.cache.redis-url": "Redis URL",
   "admin.config.cache.redis-url.description":
     "URL of the Redis instance used for caching.",

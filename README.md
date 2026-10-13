@@ -1,17 +1,23 @@
-<div align="center">
-  <img src="https://github.com/user-attachments/assets/b5bc0c1e-5641-4106-b322-a1b0f5448b0f" width="60"/>
-  
-  <h1>Pingvin Share X</h1>
+# VCPeer Send
 
-  <p align="center">
+**"Send a link" — the WeTransfer-style file transfer product inside the
+[VCPeer](https://vcpeer.com) suite.**
 
-![GitHub Release](https://img.shields.io/github/v/release/smp46/pingvin-share-x) [![Crowdin](https://badges.crowdin.net/pingvin-share-x/localized.svg)](https://crowdin.com/project/pingvin-share-x) ![Docker Pulls](https://img.shields.io/docker/pulls/smp46/pingvin-share-x) [![GitHub Sponsors](https://img.shields.io/badge/Sponsor-%40smp46-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/smp46)
+This is VCPeer's fork of [Pingvin Share X](https://github.com/smp46/pingvin-share-x)
+by smp46, itself a fork of the original
+[Pingvin Share](https://github.com/stonith404/pingvin-share) by stonith404
+(archived). Licensed BSD-2-Clause — see `LICENSE` and `NOTICE.md` for full
+upstream credit. We adopted this project rather than hand-rolling a transfer
+pipeline: see `/Users/arhansubasi/products/plans/vcpeer.md` for why it was
+chosen over Erugo, psitransfer, timvisee/send, and Gokapi.
 
-  </p>
-</div>
+Deploys at **share.vcpeer.com**, linked from `vcpeer.com/send`. Deploy guide:
+`deploy/RUNBOOK.md`.
 
+---
 
-Pingvin Share X is a fork of [Pingvin Share](https://github.com/stonith404/pingvin-share), a self-hosted file sharing platform and an alternative for WeTransfer.
+The sections below are upstream Pingvin Share X documentation, kept for
+contributors working on this fork.
 
 ## Features
 
