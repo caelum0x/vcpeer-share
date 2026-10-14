@@ -41,7 +41,15 @@ export async function middleware(request: NextRequest) {
       "/imprint",
       "/privacy",
     ]),
-    admin: new Routes(["/admin/*"]),
+    // "/admin" (the bare index page) must be listed explicitly, not just
+    // "/admin/*" — the Routes regex requires a trailing "/" after the
+    // prefix, so without this the ADMIN rule below never matched the bare
+    // "/admin" route. That left it relying solely on the generic
+    // "unauthenticated state" rule for protection, which is bypassed when
+    // security.allowUnauthenticatedShares sets routes.public to ["*"],
+    // exposing the /admin shell (nav only; admin API calls still require
+    // real auth) to anonymous visitors.
+    admin: new Routes(["/admin", "/admin/*"]),
     account: new Routes(["/account*"]),
     disabled: new Routes([]),
   };
