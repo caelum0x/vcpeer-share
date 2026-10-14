@@ -193,16 +193,23 @@ upstream owns) is the fast check. Then bump the pinned image tag in
 
 ## Repo
 
-Not yet pushed to GitHub under the owner's account (local fork only, at
-`/Users/arhansubasi/products/vcpeer-share`, branch `vcpeer-2026-10-15`,
-`upstream` remote = `smp46/pingvin-share-x`). Before the box can `git clone`
-it, push this to a new repo, e.g. `caelum0x/vcpeer-share` (not yet
-created — owner-only step: create the empty GitHub repo, then
-`git remote add origin https://github.com/caelum0x/vcpeer-share.git && git push -u origin vcpeer-2026-10-15`).
+Pushed to **`caelum0x/vcpeer-share`** (private). All rebrand + deploy-artifact
+work is merged to `main` (fast-forward from `vcpeer-2026-10-15`, which is also
+pushed and kept as a reference branch, not deleted). `upstream` remote stays
+`smp46/pingvin-share-x` as the sync source — see "Upstream-sync procedure"
+below. The box should `git clone https://github.com/caelum0x/vcpeer-share.git`
+and check out `main` directly; no branch switch needed.
+
+Checked before pushing: none of this repo's GitHub Actions workflows trigger
+on push to `main` in a way that deploys anywhere. `docker-build-push.yml`
+(the only one that publishes images) only runs on `release: published` or
+manual `workflow_dispatch`, not on push. `docker-security.yml` runs a local
+Trivy scan on push to `main` but only builds the image with `load: true`
+(no registry push, no deploy). Pushing `main` is therefore safe and does not
+touch production.
 
 ## Owner-only (not done in this build session, silent blockers)
 
-- Create the `caelum0x/vcpeer-share` GitHub repo and push this branch.
 - DNS record for `share.vcpeer.com` → the deploy box's IP.
 - Real Scribase Mail SMTP credentials in `deploy/config.yaml` /
   `deploy/.env` (`REPLACE_WITH_SCRIBASE_MAIL_SMTP_USERNAME/PASSWORD`).
