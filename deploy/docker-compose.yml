@@ -25,7 +25,12 @@ services:
       - TRUST_PROXY=true # behind Caddy / Cloudflare Tunnel
       - CADDY_DISABLED=false # keep the built-in Caddy (handles frontend+backend routing)
       - PUID=1000
-      - PGID=1000
+      - PGID=1002 # must match the deploying host's group on ./config.yaml
+        # (deploy puts it root:deploy 0640 — see RUNBOOK.md "Permissions
+        # gotcha"). If PGID can't read the file, the container silently
+        # falls back to defaults ("Config.yaml is not set. Falling back to
+        # UI configuration." in the logs) instead of erroring — SMTP creds,
+        # the real admin user, and allowUnauthenticatedShares never apply.
       - TZ=UTC
     volumes:
       - vcpeer-send-data:/opt/app/backend/data:rw

@@ -100,7 +100,10 @@ export default function Home() {
 
   return (
     <>
-      <Meta title="Home" />
+      <Meta
+        title="Home"
+        description="Free WeTransfer alternative for sending large files fast. No account required for quick transfers, open-source, and self-hostable if you want full control of your data."
+      />
       <Container>
         <div className={classes.inner}>
           <div className={classes.content}>
