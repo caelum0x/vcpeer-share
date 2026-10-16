@@ -140,7 +140,16 @@ s3:
 
 legal:
   enabled: "true"
-  imprintUrl: "https://vcpeer.com/imprint"
+  # Explicit empty string (not omitted - config.service.ts only overwrites
+  # the stored value when the yaml key is present, so omitting it would
+  # leave the old broken value in place): vcpeer.com has no /imprint page
+  # (no real company/legal disclosure content to publish there), and the
+  # previous value here ("https://vcpeer.com/imprint") 404s. Pingvin Share X
+  # only renders the Imprint footer link when imprintUrl/imprintText is
+  # non-empty, so this hides the link instead of sending visitors to a
+  # broken page. Add a real imprintUrl (or imprintText) here if/when
+  # vcpeer.com ships one.
+  imprintUrl: ""
   privacyPolicyUrl: "https://vcpeer.com/privacy"
 
 initUser:
