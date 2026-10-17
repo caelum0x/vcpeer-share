@@ -100,8 +100,12 @@ const Body = ({
       sendEmailNotification: false,
       expiration_num: defaultTimespan.value,
       expiration_unit: `-${defaultTimespan.unit}` as string,
-      simplified: !reverseShareSimpleOnly
-        ? false
+      // When the admin forces simple mode for everyone, the switch below is
+      // hidden and the creator has no way to opt out, so this must always
+      // default to true. Only when the admin leaves it as a choice do we
+      // fall back to the creator's last preference (cookie, default false).
+      simplified: reverseShareSimpleOnly
+        ? true
         : !!(getCookie("reverse-share.simplified") ?? false),
       publicAccess: !!(getCookie("reverse-share.public-access") ?? true),
     },
