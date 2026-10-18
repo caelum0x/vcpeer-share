@@ -122,6 +122,12 @@ export class ShareService {
       share.security.password = await argon.hash(share.security.password);
     }
 
+    // Download notifications are emailed to the share's creator, so they're
+    // meaningless (and would silently never fire) on an anonymous share.
+    if (share.security?.notifyOnDownload && !user) {
+      share.security.notifyOnDownload = false;
+    }
+
     if (
       this.configService.get("share.enableUserRecipients") &&
       share.security?.restrictToRecipients
@@ -563,8 +569,12 @@ export class ShareService {
       body.security.maxViews !== undefined
         ? body.security.maxViews
         : currentSecurity?.maxViews;
+    const nextNotifyOnDownload =
+      body.security.notifyOnDownload !== undefined
+        ? body.security.notifyOnDownload
+        : (currentSecurity?.notifyOnDownload ?? false);
 
-    if (!nextPassword && !nextMaxViews) {
+    if (!nextPassword && !nextMaxViews && !nextNotifyOnDownload) {
       if (currentSecurity) {
         await this.prisma.shareSecurity.delete({ where: { shareId } });
       }
@@ -577,10 +587,12 @@ export class ShareService {
         share: { connect: { id: shareId } },
         password: nextPassword,
         maxViews: nextMaxViews,
+        notifyOnDownload: nextNotifyOnDownload,
       },
       update: {
         password: nextPassword,
         maxViews: nextMaxViews,
+        notifyOnDownload: nextNotifyOnDownload,
       },
     });
   }
@@ -621,6 +633,7 @@ export class ShareService {
         maxViews: share.security?.maxViews,
         passwordProtected: !!share.security?.password,
         restrictToRecipients: !!share.security?.restrictToRecipients,
+        notifyOnDownload: !!share.security?.notifyOnDownload,
       },
     };
   }

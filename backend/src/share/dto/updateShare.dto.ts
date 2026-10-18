@@ -22,6 +22,10 @@ export class UpdateShareSecurityDTO {
   @IsNumber()
   @IsOptional()
   maxViews?: number | null;
+
+  @IsBoolean()
+  @IsOptional()
+  notifyOnDownload?: boolean;
 }
 
 export class UpdateShareDTO {

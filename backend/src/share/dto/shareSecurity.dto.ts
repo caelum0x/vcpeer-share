@@ -19,4 +19,8 @@ export class ShareSecurityDTO {
   @IsBoolean()
   @IsOptional()
   restrictToRecipients: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  notifyOnDownload: boolean;
 }

@@ -264,6 +264,15 @@ export const configVariables = {
       defaultValue:
         "Hey!\n\n{recipientEmail} downloaded {fileName} from your share: {shareUrl}\n\nVCPeer Send",
     },
+    shareLinkDownloadNotificationSubject: {
+      type: "string",
+      defaultValue: "Your file was downloaded",
+    },
+    shareLinkDownloadNotificationMessage: {
+      type: "text",
+      defaultValue:
+        "Hey!\n\n{fileName} was just downloaded from your share: {shareUrl}\n\nVCPeer Send",
+    },
     verificationSubject: {
       type: "string",
       defaultValue: "Verify your VCPeer Send account",

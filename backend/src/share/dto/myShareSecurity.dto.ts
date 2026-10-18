@@ -9,4 +9,7 @@ export class MyShareSecurityDTO {
 
   @Expose()
   restrictToRecipients: boolean;
+
+  @Expose()
+  notifyOnDownload: boolean;
 }

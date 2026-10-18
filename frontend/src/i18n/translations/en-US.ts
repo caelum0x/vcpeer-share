@@ -450,6 +450,8 @@ export default {
   "upload.modal.accordion.security.password.placeholder": "No password",
   "upload.modal.accordion.security.max-views.label": "Maximum views",
   "upload.modal.accordion.security.max-views.placeholder": "No limit",
+  "upload.modal.accordion.security.notify-on-download.label":
+    "Email me when this link is downloaded",
 
   // showCompletedUploadModal.tsx
   "upload.modal.completed.never-expires": "This share will never expire.",

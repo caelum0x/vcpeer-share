@@ -201,58 +201,108 @@ export class FileService {
   ) {
     try {
       if (
-        !recipientId ||
         !this.configService.get("smtp.enabled") ||
-        !this.configService.get("share.enableShareEmailRecipients") ||
         !this.configService.get("share.enableShareDownloadNotifications")
       )
         return;
 
-      const notificationKey = `share-download-notification:${shareId}:${recipientId}`;
-      if (await this.cache.get<true>(notificationKey)) return;
-
-      const share = await this.prisma.share.findUnique({
-        where: { id: shareId },
-        select: {
-          id: true,
-          creator: {
-            select: { email: true, username: true, displayName: true },
-          },
-          recipients: {
-            where: { id: recipientId },
-            select: { email: true },
-          },
-        },
-      });
-
-      const recipient = share?.recipients[0];
-      if (!share?.creator?.email || !recipient) return;
-
-      const recipientUser = await this.prisma.user.findUnique({
-        where: { email: recipient.email },
-        select: { displayName: true, username: true },
-      });
-
-      await this.cache.set(
-        notificationKey,
-        true,
-        DOWNLOAD_NOTIFICATION_COOLDOWN_MS,
-      );
-
-      await this.emailService.sendShareDownloadNotification(
-        share.creator.email,
-        share.id,
-        fileName,
-        recipient.email,
-        share.creator?.displayName || share.creator?.username,
-        recipientUser?.displayName || recipientUser?.username,
-      );
+      if (recipientId) {
+        await this.notifyNamedRecipientDownload(shareId, fileName, recipientId);
+      } else {
+        await this.notifyAnonymousLinkDownload(shareId, fileName);
+      }
     } catch (e) {
       this.logger.error(
         `Failed to notify recipient download for share ${shareId}`,
         e instanceof Error ? e.stack : String(e),
       );
     }
+  }
+
+  // Notifies the creator when a named email recipient (added via the share's
+  // recipient list) downloads a file.
+  private async notifyNamedRecipientDownload(
+    shareId: string,
+    fileName: string,
+    recipientId: string,
+  ) {
+    if (!this.configService.get("share.enableShareEmailRecipients")) return;
+
+    const notificationKey = `share-download-notification:${shareId}:${recipientId}`;
+    if (await this.cache.get<true>(notificationKey)) return;
+
+    const share = await this.prisma.share.findUnique({
+      where: { id: shareId },
+      select: {
+        id: true,
+        creator: {
+          select: { email: true, username: true, displayName: true },
+        },
+        recipients: {
+          where: { id: recipientId },
+          select: { email: true },
+        },
+      },
+    });
+
+    const recipient = share?.recipients[0];
+    if (!share?.creator?.email || !recipient) return;
+
+    const recipientUser = await this.prisma.user.findUnique({
+      where: { email: recipient.email },
+      select: { displayName: true, username: true },
+    });
+
+    await this.cache.set(
+      notificationKey,
+      true,
+      DOWNLOAD_NOTIFICATION_COOLDOWN_MS,
+    );
+
+    await this.emailService.sendShareDownloadNotification(
+      share.creator.email,
+      share.id,
+      fileName,
+      recipient.email,
+      share.creator?.displayName || share.creator?.username,
+      recipientUser?.displayName || recipientUser?.username,
+    );
+  }
+
+  // Notifies the creator when anyone downloads a file from a plain share
+  // link (no named recipients involved) — opted into per-share via
+  // ShareSecurity.notifyOnDownload. This is the common WeTransfer-style
+  // "your file was downloaded" flow: most shares are just a link pasted
+  // into chat/email, not sent through the recipients feature.
+  private async notifyAnonymousLinkDownload(shareId: string, fileName: string) {
+    const notificationKey = `share-download-notification:${shareId}:anonymous`;
+    if (await this.cache.get<true>(notificationKey)) return;
+
+    const share = await this.prisma.share.findUnique({
+      where: { id: shareId },
+      select: {
+        id: true,
+        creator: {
+          select: { email: true, username: true, displayName: true },
+        },
+        security: { select: { notifyOnDownload: true } },
+      },
+    });
+
+    if (!share?.creator?.email || !share.security?.notifyOnDownload) return;
+
+    await this.cache.set(
+      notificationKey,
+      true,
+      DOWNLOAD_NOTIFICATION_COOLDOWN_MS,
+    );
+
+    await this.emailService.sendAnonymousShareDownloadNotification(
+      share.creator.email,
+      share.id,
+      fileName,
+      share.creator?.displayName || share.creator?.username,
+    );
   }
 
   async getStorageProvider(shareId: string): Promise<string> {

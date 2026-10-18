@@ -221,6 +221,7 @@ const EditShareBody = ({
   const security = share.security ?? {
     passwordProtected: false,
     maxViews: undefined,
+    notifyOnDownload: false,
   };
 
   const validationSchema = yup.object().shape({
@@ -256,6 +257,7 @@ const EditShareBody = ({
       password: "",
       removePassword: false,
       maxViews: security.maxViews || undefined,
+      notifyOnDownload: security.notifyOnDownload || false,
     },
     validate: yupResolver(validationSchema),
   });
@@ -295,6 +297,7 @@ const EditShareBody = ({
         password: values.password || undefined,
         removePassword: values.removePassword,
         maxViews: values.maxViews || null,
+        notifyOnDownload: values.notifyOnDownload,
       },
     };
 
@@ -370,6 +373,12 @@ const EditShareBody = ({
           )}
           label={t("upload.modal.accordion.security.max-views.label")}
           {...form.getInputProps("maxViews")}
+        />
+        <Checkbox
+          label={t(
+            "upload.modal.accordion.security.notify-on-download.label",
+          )}
+          {...form.getInputProps("notifyOnDownload", { type: "checkbox" })}
         />
         <Group position="right">
           <Button variant="default" onClick={onCancel}>

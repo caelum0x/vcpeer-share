@@ -179,6 +179,36 @@ export class EmailService {
     );
   }
 
+  async sendAnonymousShareDownloadNotification(
+    creatorEmail: string,
+    shareId: string,
+    fileName: string,
+    creatorName?: string,
+  ) {
+    const shareUrl = `${this.config.get("general.appUrl")}/s/${shareId}`;
+
+    const vars = {
+      fileName,
+      shareUrl,
+      creator: creatorName ?? "",
+      name: creatorName ?? "",
+    };
+
+    await this.sendMail(
+      creatorEmail,
+      this.formatTemplate(
+        this.config.get("email.shareLinkDownloadNotificationSubject"),
+        vars,
+      ),
+      this.formatTemplate(
+        this.config.get("email.shareLinkDownloadNotificationMessage"),
+        vars,
+      ),
+      undefined,
+      creatorName,
+    );
+  }
+
   async sendMailToReverseShareCreator(
     recipientEmail: string,
     shareId: string,

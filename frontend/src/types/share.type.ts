@@ -38,6 +38,7 @@ export type UpdateShare = {
     password?: string;
     removePassword?: boolean;
     maxViews?: number | null;
+    notifyOnDownload?: boolean;
   };
 };
 
@@ -66,10 +67,12 @@ export type ShareSecurity = {
   maxViews?: number;
   password?: string;
   restrictToRecipients?: boolean;
+  notifyOnDownload?: boolean;
 };
 
 export type MyShareSecurity = {
   passwordProtected: boolean;
   maxViews?: number;
   restrictToRecipients: boolean;
+  notifyOnDownload: boolean;
 };

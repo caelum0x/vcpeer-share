@@ -171,6 +171,7 @@ const CreateUploadModalBody = ({
       expiration_unit: `-${defaultTimespan.unit}` as string,
       never_expires: false,
       restrictToRecipients: false,
+      notifyOnDownload: false,
     },
     validate: yupResolver(validationSchema),
   });
@@ -233,6 +234,7 @@ const CreateUploadModalBody = ({
               : values.password || undefined,
             maxViews: values.maxViews || undefined,
             restrictToRecipients: values.restrictToRecipients || undefined,
+            notifyOnDownload: values.notifyOnDownload || undefined,
           },
         },
         files,
@@ -479,6 +481,16 @@ const CreateUploadModalBody = ({
                     label={t("upload.modal.accordion.security.max-views.label")}
                     {...form.getInputProps("maxViews")}
                   />
+                  {options.isUserSignedIn && (
+                    <Checkbox
+                      label={t(
+                        "upload.modal.accordion.security.notify-on-download.label",
+                      )}
+                      {...form.getInputProps("notifyOnDownload", {
+                        type: "checkbox",
+                      })}
+                    />
+                  )}
                 </Stack>
               </Accordion.Panel>
             </Accordion.Item>
