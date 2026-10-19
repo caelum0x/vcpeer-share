@@ -103,6 +103,7 @@ export default function Home() {
       <Meta
         title="Home"
         description="Free WeTransfer alternative for sending large files fast. No account required for quick transfers, open-source, and self-hostable if you want full control of your data."
+        noIndex={false}
       />
       <Container>
         <div className={classes.inner}>

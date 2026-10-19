@@ -4,9 +4,17 @@ import useConfig from "../hooks/config.hook";
 const Meta = ({
   title,
   description,
+  noIndex = true,
 }: {
   title: string;
   description?: string;
+  /**
+   * Defaults to true so every page (account, admin, share links, auth
+   * tokens, etc.) stays out of search results unless a page explicitly
+   * opts in. Only public marketing pages (e.g. the homepage) should pass
+   * `noIndex={false}`.
+   */
+  noIndex?: boolean;
 }) => {
   const config = useConfig();
 
@@ -22,6 +30,10 @@ const Meta = ({
       <meta name="og:description" content={metaDescription} />
       <meta name="twitter:title" content={metaTitle} />
       <meta name="twitter:description" content={metaDescription} />
+      <meta
+        name="robots"
+        content={noIndex ? "noindex, nofollow" : "index, follow"}
+      />
     </Head>
   );
 };
