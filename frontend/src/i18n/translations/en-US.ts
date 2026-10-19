@@ -19,12 +19,12 @@ export default {
   // END footer
 
   // /
-  "home.title": "A <h>self-hosted</h> file sharing platform.",
+  "home.title": "Send large files. <h>No account needed.</h>",
 
   "home.description":
-    "Do you really want to put your personal files in the hands of third parties like WeTransfer?",
-  "home.bullet.a.name": "Self-Hosted",
-  "home.bullet.a.description": "Host VCPeer Send on your own machine.",
+    "A self-hosted WeTransfer alternative. Upload a file, get a link, send it — your files never go through a third party.",
+  "home.bullet.a.name": "No sign-up",
+  "home.bullet.a.description": "Upload and share a link in seconds, no account required.",
   "home.bullet.b.name": "Privacy",
   "home.bullet.b.description":
     "Your files are yours and will never be accessed by third parties.",
@@ -32,7 +32,7 @@ export default {
   "home.bullet.c.description":
     "Upload files as large as you want. Your available storage is the only limit.",
 
-  "home.button.start": "Get started",
+  "home.button.start": "Upload a file",
   "home.button.source": "Source code",
   // END /
 

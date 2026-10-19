@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { TbCheck } from "react-icons/tb";
 import { FormattedMessage } from "react-intl";
 import Logo from "../components/Logo";
@@ -75,7 +75,6 @@ export default function Home() {
   const { refreshUser } = useUser();
   const router = useRouter();
   const config = useConfig();
-  const [signupEnabled, setSignupEnabled] = useState(true);
 
   // If user is already authenticated, redirect to the upload page
   useEffect(() => {
@@ -84,18 +83,15 @@ export default function Home() {
         router.replace("/upload");
       }
     });
-
-    // If registration is disabled, get started button should redirect to the sign in page
-    try {
-      const allowRegistration = config.get("security.allowRegistration");
-      setSignupEnabled(allowRegistration !== false);
-    } catch (error) {
-      setSignupEnabled(true);
-    }
   }, [config]);
 
+  // Uploading never requires an account on this instance (matches the
+  // "no account needed to start" promise on vcpeer.com). Sending someone
+  // to a signIn/signUp wall here was a dead end for visitors when
+  // registration is disabled. Account creation/sign-in remain available
+  // from the nav for people who explicitly want one.
   const getButtonHref = () => {
-    return signupEnabled ? "/auth/signUp" : "/auth/signIn";
+    return "/upload";
   };
 
   return (
