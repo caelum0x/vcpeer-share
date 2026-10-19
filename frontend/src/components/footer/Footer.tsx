@@ -35,6 +35,14 @@ const Footer = () => {
           <Anchor size="xs" href="https://vcpeer.com/send" target="_blank">
             send your own
           </Anchor>
+          {" • "}
+          <Anchor size="xs" href="https://live.vcpeer.com" target="_blank">
+            VCPeer Live
+          </Anchor>
+          {" • "}
+          <Anchor size="xs" href="https://book.vcpeer.com/admin/30min" target="_blank">
+            book a call
+          </Anchor>
         </Text>
       )}
       {config.get("legal.enabled") && (
@@ -48,6 +56,14 @@ const Footer = () => {
             {" — "}
             <Anchor size="xs" href="https://vcpeer.com/send" target="_blank">
               send your own
+            </Anchor>
+            {" • "}
+            <Anchor size="xs" href="https://live.vcpeer.com" target="_blank">
+              VCPeer Live
+            </Anchor>
+            {" • "}
+            <Anchor size="xs" href="https://book.vcpeer.com/admin/30min" target="_blank">
+              book a call
             </Anchor>
           </Text>
           <div>
