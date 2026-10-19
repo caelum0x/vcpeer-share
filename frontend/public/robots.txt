@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /$
+Allow: /privacy
+Allow: /imprint
+Disallow: /account
+Disallow: /admin
+Disallow: /auth
+Disallow: /share
+Disallow: /s/
+Disallow: /upload
+Disallow: /api
+
+Sitemap: https://share.vcpeer.com/sitemap.xml
