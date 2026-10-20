@@ -92,15 +92,31 @@ export class UserSevice {
       const hash = user.password && (await argon.hash(user.password));
       const { displayName, ...rest } = user;
 
-      return await this.prisma.user.update({
-        where: { id },
-        data: {
-          ...rest,
-          ...(displayName !== undefined && {
-            displayName: displayName?.trim() || null,
-          }),
-          password: hash,
-        },
+      // An admin changing another user's password or deactivating their
+      // account is a security-sensitive action: any existing sessions for
+      // that user must stop working immediately instead of staying valid
+      // until the access token's natural expiry or the refresh token is
+      // used again.
+      const shouldRevokeSessions =
+        !!user.password || user.isActivated === false;
+
+      return await this.prisma.$transaction(async (tx) => {
+        const updatedUser = await tx.user.update({
+          where: { id },
+          data: {
+            ...rest,
+            ...(displayName !== undefined && {
+              displayName: displayName?.trim() || null,
+            }),
+            password: hash,
+          },
+        });
+
+        if (shouldRevokeSessions) {
+          await tx.refreshToken.deleteMany({ where: { userId: id } });
+        }
+
+        return updatedUser;
       });
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError) {

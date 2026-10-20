@@ -28,6 +28,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const user: User = await this.prisma.user.findUnique({
       where: { id: payload.sub },
     });
+
+    // A deactivated account must lose access immediately, not just once its
+    // short-lived access token naturally expires or its refresh token is
+    // used again.
+    if (!user || !user.isActivated) return null;
+
     return user;
   }
 }
