@@ -111,7 +111,13 @@ export class FileSecurityGuard extends ShareSecurityGuard {
         );
       }
 
-      await this._shareService.increaseViewCount(share);
+      // Do NOT increment here: the view for this visit was already counted
+      // once by ShareService.getShareToken, which the frontend always calls
+      // before it can load a share (password-protected or not — see
+      // ShareSecurityGuard's mandatory token check). Incrementing again per
+      // file access double-counted every preview/download, so a public
+      // share with e.g. maxViews=1 locked out its own single visitor as
+      // soon as they opened a second file (or even the first).
       return true;
     } else {
       return super.canActivate(context);

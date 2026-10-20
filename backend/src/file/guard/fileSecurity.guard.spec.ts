@@ -67,7 +67,19 @@ describe("FileSecurityGuard", () => {
       prisma.share.findUnique.mockResolvedValue(baseShare());
 
       await expect(guard.canActivate(makeContext({}))).resolves.toBe(true);
-      expect(shareService.increaseViewCount).toHaveBeenCalled();
+    });
+
+    it("does not re-increment the view count per file (already counted once at token issuance)", async () => {
+      // Regression: incrementing here on top of ShareService.getShareToken's
+      // per-visit increment made maxViews count file accesses instead of
+      // visits, locking a public share's own single visitor out after
+      // opening just one or two files.
+      prisma.share.findUnique.mockResolvedValue(
+        baseShare({ security: { maxViews: 2 }, views: 1 }),
+      );
+
+      await expect(guard.canActivate(makeContext({}))).resolves.toBe(true);
+      expect(shareService.increaseViewCount).not.toHaveBeenCalled();
     });
 
     it("allows direct download even when a stale/invalid share-token cookie is present", async () => {
