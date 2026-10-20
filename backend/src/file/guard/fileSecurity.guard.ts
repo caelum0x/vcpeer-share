@@ -43,8 +43,6 @@ export class FileSecurityGuard extends ShareSecurityGuard {
       throw new BadRequestException(this._i18n.t("file.invalidIdFormat"));
     }
 
-    const shareToken = request.cookies[`share_${shareId}_token`];
-
     const share = await this._prisma.share.findUnique({
       where: { id: shareId },
       include: {
@@ -55,8 +53,15 @@ export class FileSecurityGuard extends ShareSecurityGuard {
       },
     });
 
-    // If there is no share token the user requests a file directly
-    if (!shareToken) {
+    // Only password-protected shares actually need a verified share token
+    // (it's the only proof that the password was entered correctly). Shares
+    // without a password must stay directly downloadable even if a
+    // leftover/invalid `share_<id>_token` cookie happens to be sent (e.g. the
+    // share id was reused, the token predates a security change, or a proxy
+    // forwarded an unrelated cookie) — branching on cookie *presence* instead
+    // of on whether the share actually requires one incorrectly turned those
+    // into hard "share_token_required" failures for fully public shares.
+    if (!share?.security?.password) {
       const user = await this.authenticateUser(context);
 
       // If admin access is enabled and user is admin, allow access
@@ -98,9 +103,6 @@ export class FileSecurityGuard extends ShareSecurityGuard {
           );
         }
       }
-
-      if (share.security?.password)
-        throw new ForbiddenException(this._i18n.t("file.passwordProtected"));
 
       if (share.security?.maxViews && share.security.maxViews <= share.views) {
         throw new ForbiddenException(
