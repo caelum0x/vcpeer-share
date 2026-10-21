@@ -1,11 +1,11 @@
 # VCPeer Send — deploy runbook
 
-Everything in this directory was **written and committed, not executed** during
-the 2026-10-15 build session (hard limit on that session: no production deploy,
-no DNS/server changes, local only). This is the runbook for whoever runs the
-actual deploy later (owner-approved session, per the standing
-continuous-waves/deploy-approval rule — see
-`~/.claude/projects/-Users-arhansubasi-products/memory/feedback-continuous-waves-2026-09-28.md`).
+**Status: LIVE at `share.vcpeer.com`** (deployed 2026-10-15, redeployed
+2026-10-21 for bug fixes — see "Current deployment" below). The sections
+below describing a future first-time deploy are kept for disaster-recovery
+(rebuilding on a fresh box from scratch), but the "Target box" section's
+original choice (`89.168.106.142`) was corrected before that first deploy —
+see "Current deployment" for where this actually runs.
 
 Follows the same shape as `/Users/arhansubasi/products/vcpeer/deploy/README.md`
 (the MiroTalk-fork runbook) for consistency across the two VCPeer products.
@@ -24,7 +24,45 @@ It runs as a single prebuilt multi-arch Docker image
 (`ghcr.io/smp46/pingvin-share-x:v2.0.0`, `linux/amd64` + `linux/arm64`) — no
 build step on the box, just pull and run.
 
-## Target box and a real gap to close first
+## Current deployment (actual, as of 2026-10-21)
+
+Runs on Oracle box **`box` (130.61.180.42)**, not the `89.168.106.142` micro
+instance named in the original plan below (that box only has 956MB RAM —
+too tight; see `plans/vcpeer.md` "Send a link = adopted OSS" for the
+2026-10-14 correction to use `box` instead). `ssh box` (alias already in
+`~/.ssh/config`).
+
+- Source lives at `/srv/src/vcpeer-share` on the box (plain rsync'd
+  checkout, not a git clone — redeploy by rsyncing this repo's working tree
+  there, excluding `.git`/`node_modules`, then rebuilding).
+- Image is **built locally on the box from this repo's own `Dockerfile`**
+  (tagged `vcpeer-send:local`), not the upstream prebuilt
+  `ghcr.io/smp46/pingvin-share-x` image referenced in the "Steps" section
+  below — the rebrand (logo, copy, email templates) only exists in our fork,
+  not upstream's image.
+- Compose file + `config.yaml` live at `/opt/infra-box/stacks/vcpeer-share/`
+  on the box (separate from the source checkout). To redeploy after a code
+  change:
+  ```
+  rsync -az --delete --exclude .git --exclude node_modules \
+    ./ box:/srv/src/vcpeer-share/
+  ssh box "cd /srv/src/vcpeer-share && docker build -t vcpeer-send:local ."
+  ssh box "cd /opt/infra-box/stacks/vcpeer-share && docker compose up -d"
+  ```
+  The build takes several minutes on this box (shared Ampere core) — run it
+  as a single foreground command over one persistent SSH connection rather
+  than trying to background+disown it; this box's sshd/PAM session teardown
+  kills orphaned background jobs even under `setsid`/`nohup`/`disown`.
+- Fronted by the box's existing reverse proxy at `share.vcpeer.com` (DNS
+  already live, Cloudflare).
+- Before any deploy that touches data (none of the fixes above did):
+  `docker run --rm -v vcpeer-send_vcpeer-send-data:/data -v /opt/infra-box/stacks/vcpeer-share:/backup alpine tar czf /backup/vcpeer-send-data-backup-$(date +%Y%m%d%H%M%S).tgz -C /data .`
+  Rollback = `docker compose up -d` after `docker build` from a previous git
+  commit, or `docker tag <previous-image-id> vcpeer-send:local && docker
+  compose up -d` if an older image is still present locally (`docker images
+  vcpeer-send`).
+
+## Target box and a real gap to close first (original plan, superseded above)
 
 Owner-specified target: **Oracle E2.1.Micro, `89.168.106.142`**, same box as
 the VCPeer (MiroTalk) product, per `vcpeer/deploy/README.md` conventions:
@@ -208,21 +246,27 @@ Trivy scan on push to `main` but only builds the image with `load: true`
 (no registry push, no deploy). Pushing `main` is therefore safe and does not
 touch production.
 
-## Owner-only (not done in this build session, silent blockers)
+## Owner-only (still open as of 2026-10-21)
 
-- DNS record for `share.vcpeer.com` → the deploy box's IP.
-- Real Scribase Mail SMTP credentials in `deploy/config.yaml` /
-  `deploy/.env` (`REPLACE_WITH_SCRIBASE_MAIL_SMTP_USERNAME/PASSWORD`).
-- Real admin email + a generated password in `deploy/config.yaml`
-  (`initUser.email` / `initUser.password`) — `openssl rand -base64 24`.
-- Decide and run: install Docker + add swap on `89.168.106.142` (steps above),
-  or use the `recoder.xyz` box instead if RAM is too tight even with swap.
-- Actual `docker compose up -d` + Caddy/tunnel wiring on the box (steps 3-6
-  above) — nothing in this session touched the live box, per the "local
-  only" limit.
+Everything in the original list below this line was resolved by the
+2026-10-15 deploy + the 2026-10-21 bug-fix redeploy **except**:
+
 - If/when Cloudflare R2 is wanted instead of local disk: create the R2
   bucket + API token, fill `deploy/config.yaml` → `s3.*` and flip
-  `s3.enabled: "true"`.
-- Railyard Insights tag: needs one small source patch (see step 7 above), not
-  just a config change — do this as a follow-up commit before relying on it
-  for traffic numbers.
+  `s3.enabled: "true"` (still on local disk today, by choice, not a gap).
+- Railyard Insights site key `ry_site_vcpeer_send_80cdc14ff6bc` (shipped in
+  `frontend/src/pages/_document.tsx` 2026-10-21) only starts actually
+  counting once it's registered server-side in the `railyard` repo (a D1
+  `signups` row + `SITES` KV `site:<key>` entry, mirroring `createSite` in
+  `railyard/apps/insights-edge/src/selfserve.mjs`) and that Worker is
+  redeployed — a production write in a *different* repo, out of scope for
+  this pass. Also add `share.vcpeer.com` to
+  `railyard/apps/insights-edge/docs/FIRST-PARTY-SITES.md`'s table and (as the
+  belt-and-suspenders fallback) `inject/wrangler.jsonc`'s `SITE_KEYS`, same
+  pattern as yokharita.com/oxhanatelier.com.
+- Resolved and no longer blockers (kept here only as a historical note):
+  DNS for `share.vcpeer.com` (live), Scribase Mail SMTP creds (configured,
+  confirmed delivering), real admin password (set), Docker on the deploy box
+  (box `130.61.180.42` always had it — the swap/Docker-install problem below
+  was specific to the originally-named `89.168.106.142`, which was never
+  used).
