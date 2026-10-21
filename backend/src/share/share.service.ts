@@ -439,11 +439,11 @@ export class ShareService {
       },
     });
 
-    if (share.removedReason)
-      throw new NotFoundException(share.removedReason, "share_removed");
-
     if (!share || !share.uploadLocked)
       throw new NotFoundException(this.i18n.t("share.notFound"));
+
+    if (share.removedReason)
+      throw new NotFoundException(share.removedReason, "share_removed");
     return {
       ...share,
       hasPassword: !!share.security?.password,

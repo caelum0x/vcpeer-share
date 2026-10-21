@@ -1,3 +1,4 @@
+import { NotFoundException } from "@nestjs/common";
 import { ShareService } from "./share.service";
 
 describe("ShareService", () => {
@@ -23,7 +24,7 @@ describe("ShareService", () => {
       {} as any,
       {} as any,
       {} as any,
-      {} as any,
+      { t: jest.fn((key: string) => key) } as any,
     );
   });
 
@@ -101,6 +102,20 @@ describe("ShareService", () => {
         expect.objectContaining({
           update: expect.objectContaining({ notifyOnDownload: true }),
         }),
+      );
+    });
+  });
+
+  describe("get()", () => {
+    it("throws a clean NotFoundException (not a TypeError) when the share doesn't exist", async () => {
+      // Regression: `get()` read `share.removedReason` before checking
+      // `!share`, so a missing/never-existed share ID crashed with
+      // "Cannot read properties of null" (an unhandled 500) instead of the
+      // intended 404 "share.notFound" response.
+      prisma.share.findUnique.mockResolvedValue(null);
+
+      await expect(service.get("does-not-exist")).rejects.toBeInstanceOf(
+        NotFoundException,
       );
     });
   });
