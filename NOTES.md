@@ -1,29 +1,39 @@
 # VCPeer Send — working notes
 
-## Needs redeploy + live verification once box access returns (not done this pass)
+## Redeployed and live-verified 2026-10-22
 
-Box `box` (130.61.180.42) was unreachable on port 22 this session (rate-limited /
-another process mid-retry) per standing instructions — no SSH, no Docker, no
-deploy was attempted. Everything below is code-only, committed to `main`, and
-**not yet live** at `share.vcpeer.com`.
+Box `box` (130.61.180.42) was reachable this pass. Followed
+`deploy/RUNBOOK.md`'s "Current deployment" section exactly: backed up the
+`vcpeer-send-data` volume, rsynced this repo's working tree (through
+`202f7365`/`65741190`, i.e. everything below) to `/srv/src/vcpeer-share`,
+ran `docker build -t vcpeer-send:local .` (new image `1e30ef1c9be5`, took
+~35 min on this heavily shared box — dozens of other product containers were
+contending for CPU, matches the runbook's "shared Ampere core" warning, just
+worse than usual), then `docker compose up -d` in
+`/opt/infra-box/stacks/vcpeer-share`. Container came up healthy, migrations
+clean, zero downtime beyond the few seconds of the restart.
 
-Whoever has box access next:
-1. Redeploy per `deploy/RUNBOOK.md`'s "Current deployment" section (rsync →
-   `docker build -t vcpeer-send:local .` → `docker compose up -d`), run as one
-   foreground command over a persistent SSH session (background/disown gets
-   killed by this box's sshd/PAM teardown — documented in the runbook).
-2. Before deploying, confirm via `docker inspect vcpeer-send...` (image build
-   timestamp) that the **currently running** container actually matches the
-   latest committed fix, not an older image — there's prior history here (see
-   memory: a DoS fix once sat un-deployed on the live container for a while
-   before a later pass caught and redeployed it). Don't assume a past "fix
-   committed" session also means "fix live".
-3. After redeploy, manually verify the maxViews race fix (see below) against
-   the live site: create a share with `maxViews: 1`, hit `POST
-   /api/shares/:id/token` twice back-to-back (e.g. two parallel curl
-   requests) and confirm only one succeeds instead of both.
+**Live verification performed against `share.vcpeer.com` itself (not a local
+sandbox):**
+- `curl https://share.vcpeer.com/api/health` → `200`.
+- `curl https://share.vcpeer.com/wetransfer-alternative` → `200`, correct
+  `<title>WeTransfer Alternative - VCPeer Send</title>`; `robots.txt` and
+  `sitemap.xml` both reference it live.
+- **maxViews TOCTOU race fix**: seeded two throwaway `maxViews: 1` shares
+  directly in the live container's Prisma DB, then fired real concurrent
+  `POST /api/shares/:id/token` requests at `share.vcpeer.com` from this
+  machine. First test (2 parallel requests): 1× `200` + 1× `403
+  share_max_views_exceeded`, DB `views` ended at exactly `1`. Second test (10
+  parallel requests against a fresh share): exactly 1× `200`, 9× `403` —
+  confirms the atomic `updateMany({ where: { views: { lt: maxViews } } })`
+  holds under real concurrency on production, not just in unit tests. Both
+  test shares deleted afterward, scratch scripts removed from the container.
 
-## What shipped this pass (code only, needs the redeploy above)
+Whoever touches this box next: the fix described below (`6302d7d0`) is now
+**live**, not just committed. Don't re-run the redeploy for this specific
+fix again — only for new commits.
+
+## What shipped in a previous pass (now redeployed and live, see above)
 
 1. **Fixed a real TOCTOU race in share `maxViews` enforcement**
    (`backend/src/share/share.service.ts`, `getShareToken`/`consumeView`).
