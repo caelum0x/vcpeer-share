@@ -19,6 +19,14 @@ export default class _Document extends Document {
         <body>
           <Main />
           <NextScript />
+          {/* Railyard Insights: cookieless page views (daily salted visitor
+              hash, no IP or cookie stored). See
+              railyard/apps/insights-edge/docs/FIRST-PARTY-SITES.md. */}
+          <script
+            defer
+            src="https://insights.ereboslab.com/s.js"
+            data-site="ry_site_vcpeer_send_80cdc14ff6bc"
+          />
         </body>
       </Html>
     );
