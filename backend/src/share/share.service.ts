@@ -677,8 +677,36 @@ export class ShareService {
   async increaseViewCount(share: Share) {
     await this.prisma.share.update({
       where: { id: share.id },
-      data: { views: share.views + 1 },
+      data: { views: { increment: 1 } },
     });
+  }
+
+  // Checking "views < maxViews" and then incrementing views as two separate
+  // steps (the previous shape of getShareToken below) let concurrent
+  // requests for the same share all read the same pre-increment view count,
+  // pass the check, and only increment afterwards -- e.g. a maxViews=1
+  // share could let in every visitor who hit this endpoint within the same
+  // race window instead of just the first one. Folding the check into the
+  // increment's WHERE clause makes it one atomic UPDATE: the database only
+  // lets the write through while views is still under the limit, so at most
+  // maxViews requests can ever win it, no matter how many arrive at once.
+  private async consumeView(share: Share & { security?: ShareSecurity }) {
+    if (!share.security?.maxViews) {
+      await this.increaseViewCount(share);
+      return;
+    }
+
+    const { count } = await this.prisma.share.updateMany({
+      where: { id: share.id, views: { lt: share.security.maxViews } },
+      data: { views: { increment: 1 } },
+    });
+
+    if (count === 0) {
+      throw new ForbiddenException(
+        this.i18n.t("share.maxViewsExceeded"),
+        "share_max_views_exceeded",
+      );
+    }
   }
 
   async getShareToken(shareId: string, password: string) {
@@ -709,15 +737,9 @@ export class ShareService {
       }
     }
 
-    if (share.security?.maxViews && share.security.maxViews <= share.views) {
-      throw new ForbiddenException(
-        this.i18n.t("share.maxViewsExceeded"),
-        "share_max_views_exceeded",
-      );
-    }
+    await this.consumeView(share);
 
     const token = await this.generateShareToken(share);
-    await this.increaseViewCount(share);
     return token;
   }
 

@@ -1,26 +1,35 @@
-import { NotFoundException } from "@nestjs/common";
+import { ForbiddenException, NotFoundException } from "@nestjs/common";
 import { ShareService } from "./share.service";
 
 describe("ShareService", () => {
   let prisma: any;
   let service: ShareService;
+  let config: any;
+  let jwtService: any;
 
   beforeEach(() => {
     prisma = {
-      share: { update: jest.fn().mockResolvedValue({}), findUnique: jest.fn() },
+      share: {
+        update: jest.fn().mockResolvedValue({}),
+        updateMany: jest.fn().mockResolvedValue({ count: 1 }),
+        findUnique: jest.fn(),
+        findFirst: jest.fn(),
+      },
       shareSecurity: {
         upsert: jest.fn().mockResolvedValue({}),
         delete: jest.fn().mockResolvedValue({}),
       },
     };
+    config = { get: jest.fn().mockReturnValue("test-jwt-secret") };
+    jwtService = { sign: jest.fn().mockReturnValue("signed-token") };
 
     service = new ShareService(
       prisma,
       {} as any,
       {} as any,
       {} as any,
-      {} as any,
-      {} as any,
+      config,
+      jwtService,
       {} as any,
       {} as any,
       {} as any,
@@ -117,6 +126,62 @@ describe("ShareService", () => {
       await expect(service.get("does-not-exist")).rejects.toBeInstanceOf(
         NotFoundException,
       );
+    });
+  });
+
+  describe("getShareToken() -> consumeView()", () => {
+    const shareWithMaxViews = (views: number, maxViews: number) => ({
+      id: "share-1",
+      createdAt: new Date(),
+      expiration: new Date(0),
+      security: { maxViews, password: null },
+      views,
+    });
+
+    it("atomically checks-and-increments views in a single conditional UPDATE instead of read-then-write", async () => {
+      // Regression: the old code checked `maxViews <= share.views` using
+      // the in-memory `share` object, then issued a separate `update` for
+      // `views + 1`. Two concurrent requests for the same maxViews=1 share
+      // both read views=0, both passed the check, and both incremented --
+      // letting more visitors in than maxViews allowed. The fix folds the
+      // check into the UPDATE's WHERE clause so only one request can ever
+      // win the write for a given view slot.
+      prisma.share.findFirst.mockResolvedValue(shareWithMaxViews(0, 1));
+      prisma.share.updateMany.mockResolvedValue({ count: 1 });
+
+      await service.getShareToken("share-1", undefined);
+
+      expect(prisma.share.updateMany).toHaveBeenCalledWith({
+        where: { id: "share-1", views: { lt: 1 } },
+        data: { views: { increment: 1 } },
+      });
+      expect(prisma.share.update).not.toHaveBeenCalled();
+    });
+
+    it("rejects the request once the atomic increment reports no row matched (limit already hit)", async () => {
+      prisma.share.findFirst.mockResolvedValue(shareWithMaxViews(1, 1));
+      // Simulates losing the race: another request's UPDATE already moved
+      // views to 1, so this request's conditional WHERE matches zero rows.
+      prisma.share.updateMany.mockResolvedValue({ count: 0 });
+
+      await expect(
+        service.getShareToken("share-1", undefined),
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      expect(jwtService.sign).not.toHaveBeenCalled();
+    });
+
+    it("falls back to a plain unconditional increment when the share has no maxViews set", async () => {
+      prisma.share.findFirst.mockResolvedValue(
+        shareWithMaxViews(5, undefined as unknown as number),
+      );
+
+      await service.getShareToken("share-1", undefined);
+
+      expect(prisma.share.updateMany).not.toHaveBeenCalled();
+      expect(prisma.share.update).toHaveBeenCalledWith({
+        where: { id: "share-1" },
+        data: { views: { increment: 1 } },
+      });
     });
   });
 
