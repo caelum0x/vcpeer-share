@@ -261,7 +261,7 @@ export class ShareService {
     }
   }
 
-  async complete(id: string, reverseShareToken?: string) {
+  async complete(id: string, _reverseShareToken?: string) {
     const share = await this.prisma.share.findUnique({
       where: { id },
       include: {
@@ -279,6 +279,19 @@ export class ShareService {
       throw new BadRequestException(
         this.i18n.t("share.completionRequiresFile"),
       );
+
+    if (share.reverseShare) {
+      // Use the token from the share's own reverseShare relation, not the
+      // request's reverse_share_token cookie - the cookie can be
+      // absent/stale while the share row still correctly points at the
+      // reverse share it was created under.
+      const useConsumed = await this.reverseShareService.consumeUse(
+        share.reverseShare.token,
+      );
+      if (!useConsumed) {
+        throw new ForbiddenException(this.i18n.t("reverseShare.usesExceeded"));
+      }
+    }
 
     if (!share.reverseShare && share.creator) {
       if (share.creator.allowShare === false) {
@@ -368,13 +381,6 @@ export class ShareService {
 
     // Check if any file is malicious with ClamAV
     void this.clamScanService.checkAndRemove(share.id);
-
-    if (share.reverseShare) {
-      await this.prisma.reverseShare.update({
-        where: { token: reverseShareToken },
-        data: { remainingUses: { decrement: 1 } },
-      });
-    }
 
     const updatedShare = await this.prisma.share.update({
       where: { id },

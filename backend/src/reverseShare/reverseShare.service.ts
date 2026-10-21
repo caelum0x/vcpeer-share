@@ -156,6 +156,37 @@ export class ReverseShareService {
     return !(isExpired || remainingUsesExceeded);
   }
 
+  /**
+   * Atomically consumes one use of a reverse share (upload request) link.
+   *
+   * `isValid` above is only an advisory read used to let/deny starting an
+   * upload early - it reads `remainingUses` once and is not safe to rely on
+   * for actually enforcing the limit, because two (or more) concurrent
+   * uploads against the same link can all read the same pre-decrement
+   * value, all pass that check, and only decrement afterward on completion.
+   * That is the same TOCTOU race class fixed for `share.maxViews` in
+   * `ShareService.getShareToken` (see commit 6302d7d0), just on the
+   * reverse-share "max uses" limit instead - a single-use upload link could
+   * otherwise accept uploads from more than one concurrent completer.
+   *
+   * This folds the check into the decrement's SQL `WHERE` clause via a
+   * single atomic `updateMany`, so at most `remainingUses` concurrent
+   * completions can ever win the write no matter how many arrive at once.
+   * Returns `false` if the link had no remaining uses left (the caller
+   * should reject the completion), `true` if this call consumed a use.
+   */
+  async consumeUse(reverseShareToken: string): Promise<boolean> {
+    const { count } = await this.prisma.reverseShare.updateMany({
+      where: {
+        token: reverseShareToken,
+        remainingUses: { gt: 0 },
+      },
+      data: { remainingUses: { decrement: 1 } },
+    });
+
+    return count > 0;
+  }
+
   async remove(id: string) {
     await this.prisma.share.updateMany({
       where: { reverseShareId: id },
