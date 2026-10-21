@@ -176,6 +176,12 @@ export default function Home() {
                 <FormattedMessage id="home.button.source" />
               </Button>
             </Group>
+
+            <Text color="dimmed" size="sm" mt="md">
+              <Link href="/wetransfer-alternative">
+                <FormattedMessage id="wetransferAlternative.table.title" />
+              </Link>
+            </Text>
           </div>
           <Group className={classes.image} align="center">
             <Logo width={200} height={200} />

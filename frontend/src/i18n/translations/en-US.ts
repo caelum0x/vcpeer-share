@@ -36,6 +36,64 @@ export default {
   "home.button.source": "Source code",
   // END /
 
+  // /wetransfer-alternative
+  "wetransferAlternative.title":
+    "Looking for a <h>WeTransfer alternative</h>?",
+  "wetransferAlternative.description":
+    "Send large files free, with no forced account, no 7-day expiry you can't change, and no surprise paywall halfway through a transfer. Open-source, so you can see exactly what happens to your files.",
+  "wetransferAlternative.button.start": "Send a file free",
+
+  "wetransferAlternative.table.title": "VCPeer Send vs. WeTransfer",
+  "wetransferAlternative.table.feature": "Feature",
+  "wetransferAlternative.table.us": "VCPeer Send",
+  "wetransferAlternative.table.them": "WeTransfer (free plan)",
+  "wetransferAlternative.table.row.account.feature": "Account required",
+  "wetransferAlternative.table.row.account.us": "Never",
+  "wetransferAlternative.table.row.account.them": "No, but nagged to sign up",
+  "wetransferAlternative.table.row.size.feature": "File size limit",
+  "wetransferAlternative.table.row.size.us":
+    "None enforced by the app — limited only by your server's disk space",
+  "wetransferAlternative.table.row.size.them": "2 GB per transfer",
+  "wetransferAlternative.table.row.expiry.feature": "Link expiry",
+  "wetransferAlternative.table.row.expiry.us":
+    "You choose — including \"never\"",
+  "wetransferAlternative.table.row.expiry.them": "Fixed at 7 days",
+  "wetransferAlternative.table.row.password.feature":
+    "Password-protect a link",
+  "wetransferAlternative.table.row.password.us": "Yes, free",
+  "wetransferAlternative.table.row.password.them": "Paid plans only",
+  "wetransferAlternative.table.row.ownership.feature": "Where files live",
+  "wetransferAlternative.table.row.ownership.us":
+    "Your own server — you control retention and access",
+  "wetransferAlternative.table.row.ownership.them":
+    "WeTransfer's servers, under their terms",
+  "wetransferAlternative.table.row.source.feature": "Source code",
+  "wetransferAlternative.table.row.source.us": "Open-source, audit it yourself",
+  "wetransferAlternative.table.row.source.them": "Closed-source",
+
+  "wetransferAlternative.faq.title": "Frequently asked questions",
+  "wetransferAlternative.faq.q1": "Is it really free?",
+  "wetransferAlternative.faq.a1":
+    "Yes. There's no paywall, trial period, or feature gated behind a plan — maxViews, expiry, password protection, and recipient notifications are all available without an account.",
+  "wetransferAlternative.faq.q2":
+    "What happens when a share reaches its view or expiry limit?",
+  "wetransferAlternative.faq.a2":
+    "The link simply stops working — the files are removed and anyone who still has the link gets a clear \"no longer available\" message instead of a confusing error.",
+  "wetransferAlternative.faq.q3": "Do I need to install anything?",
+  "wetransferAlternative.faq.a3":
+    "No. Open the link in your browser, drop your files in, and share the generated link — recipients just open it in theirs, no app or account needed on either side.",
+  "wetransferAlternative.faq.q4":
+    "Can I run my own instance instead of using this one?",
+  "wetransferAlternative.faq.a4":
+    "Yes — the full source is on GitHub under a permissive license, so you can self-host it on your own infrastructure if you'd rather not use share.vcpeer.com.",
+
+  "wetransferAlternative.related.title": "Related",
+  "wetransferAlternative.related.live":
+    "Need to talk while you send files? <a>VCPeer Live</a> runs multistream video calls on the same open-source stack.",
+  "wetransferAlternative.related.book":
+    "Sending files ahead of a meeting? <a>Book a free scheduling link</a> to go with it.",
+  // END /wetransfer-alternative
+
   // /auth/signin
   "signin.title": "Welcome back",
   "signin.description": "You don't have an account yet?",
