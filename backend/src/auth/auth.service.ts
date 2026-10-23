@@ -164,7 +164,6 @@ export class AuthService {
   }
 
   async generateToken(user: User, oauth?: { idToken?: string }) {
-    // TODO: Make all old loginTokens invalid when a new one is created
     // Check if the user has TOTP enabled
     if (user.totpVerified && !(oauth && this.config.get("oauth.ignoreTotp"))) {
       const loginToken = await this.createLoginToken(user.id);
@@ -438,13 +437,27 @@ export class AuthService {
   }
 
   async createLoginToken(userId: string) {
-    const loginToken = (
-      await this.prisma.loginToken.create({
-        data: { userId, expiresAt: moment().add(5, "minutes").toDate() },
-      })
-    ).token;
+    const loginToken = await this.prisma.$transaction(async (tx) => {
+      // A user can trigger a fresh password check (and therefore a fresh
+      // loginToken) multiple times, e.g. by retrying sign-in across tabs or
+      // devices, while an earlier loginToken is still unused and unexpired.
+      // Without invalidating those, every outstanding loginToken for the
+      // user stays valid for its full 5-minute window, so an attacker who
+      // captures an older token (or a stale one left on a previously-used
+      // device) can still complete the TOTP step with it. Mark every prior
+      // unused loginToken for this user as used before issuing the new one
+      // so only the most recently issued token can ever complete sign-in.
+      await tx.loginToken.updateMany({
+        where: { userId, used: false },
+        data: { used: true },
+      });
 
-    return loginToken;
+      return tx.loginToken.create({
+        data: { userId, expiresAt: moment().add(5, "minutes").toDate() },
+      });
+    });
+
+    return loginToken.token;
   }
 
   addTokensToResponse(
