@@ -25,6 +25,12 @@ export class MyShareDTO extends OmitType(ShareDTO, [
   @Expose()
   security?: MyShareSecurityDTO;
 
+  // Where this share was created from (?ref=live / ?ref=booking deep
+  // link into /upload), owner-facing only — not exposed on the public
+  // ShareDTO a recipient sees when opening the share.
+  @Expose()
+  source?: string;
+
   from(partial: Partial<MyShareDTO>) {
     return plainToClass(MyShareDTO, partial, { excludeExtraneousValues: true });
   }

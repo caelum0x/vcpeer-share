@@ -38,6 +38,15 @@ const promiseLimit = pLimit(3);
 let errorToastShown = false;
 let createdShare: Share;
 
+// Cross-sell attribution: VCPeer Live's post-session screen and the
+// Cal.com booking confirmation page deep-link here with ?ref=live /
+// ?ref=booking (+ an optional prefilled ?note=). Keep this in sync with
+// backend/src/share/dto/createShare.dto.ts's SHARE_SOURCE_VALUES — the API
+// re-validates against the same allowlist regardless of what the client
+// sends.
+const ALLOWED_UPLOAD_SOURCES = ["live", "booking"] as const;
+const MAX_NOTE_LENGTH = 512;
+
 const Upload = ({
   maxShareSize,
   isReverseShare = false,
@@ -73,6 +82,18 @@ const Upload = ({
 
   const autoOpenCreateUploadModal = config.get("share.autoOpenShareModal");
 
+  const refQuery =
+    typeof router.query.ref === "string" ? router.query.ref : undefined;
+  const uploadSource = (
+    ALLOWED_UPLOAD_SOURCES as readonly string[]
+  ).includes(refQuery || "")
+    ? refQuery
+    : undefined;
+  const noteQuery =
+    typeof router.query.note === "string"
+      ? router.query.note.slice(0, MAX_NOTE_LENGTH)
+      : undefined;
+
   const uploadFiles = async (share: CreateShare, files: FileUpload[]) => {
     setisUploading(true);
 
@@ -80,7 +101,7 @@ const Upload = ({
       const isReverseShare = router.pathname != "/upload";
       const totalSize = files.reduce((acc, file) => acc + file.size, 0);
       createdShare = await shareService.create(
-        { ...share, size: totalSize },
+        { ...share, size: totalSize, source: uploadSource },
         isReverseShare,
       );
     } catch (e) {
@@ -189,6 +210,7 @@ const Upload = ({
         defaultExpiration: config.get("share.defaultExpiration"),
         shareIdLength: config.get("share.shareIdLength"),
         simplified,
+        initialNote: noteQuery,
       },
       files,
       uploadFiles,

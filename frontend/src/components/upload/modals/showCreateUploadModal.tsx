@@ -52,6 +52,9 @@ const showCreateUploadModal = (
     defaultExpiration: Timespan;
     shareIdLength: number;
     simplified: boolean;
+    // Prefilled from the upload page's ?note= query param — set by a
+    // cross-sell CTA deep link (e.g. "Recording from today's call").
+    initialNote?: string;
   },
   files: FileUpload[],
   uploadCallback: (createShare: CreateShare, files: FileUpload[]) => void,
@@ -116,6 +119,7 @@ const CreateUploadModalBody = ({
     maxExpiration: Timespan;
     defaultExpiration: Timespan;
     shareIdLength: number;
+    initialNote?: string;
   };
 }) => {
   const modals = useModals();
@@ -166,7 +170,7 @@ const CreateUploadModalBody = ({
       recipients: [] as string[],
       password: undefined,
       maxViews: undefined,
-      description: undefined,
+      description: options.initialNote || undefined,
       expiration_num: defaultTimespan.value,
       expiration_unit: `-${defaultTimespan.unit}` as string,
       never_expires: false,
@@ -518,6 +522,7 @@ const SimplifiedCreateUploadModalModal = ({
     enableEmailRecepients: boolean;
     maxExpiration: Timespan;
     shareIdLength: number;
+    initialNote?: string;
   };
 }) => {
   const modals = useModals();
@@ -536,7 +541,7 @@ const SimplifiedCreateUploadModalModal = ({
   const form = useForm({
     initialValues: {
       name: undefined,
-      description: undefined,
+      description: options.initialNote || undefined,
     },
     validate: yupResolver(validationSchema),
   });
