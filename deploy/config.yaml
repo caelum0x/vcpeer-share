@@ -35,11 +35,25 @@ share:
   enableUserRecipients: "false"
   autoOpenShareModal: "true"
   reverseShareSimpleOnly: "false"
-  # Free-tier limits (owner rule): 2 GB per transfer, 7-day expiry default.
-  maxExpiration: 30 days
+  # Real free-tier limits (fixed 2026-10-23 — see STRATEGY-2026-10-23.md
+  # Growth Move #1): the landing pages already claimed "no size limit
+  # enforced by the app" and "choose any expiry, including never", but the
+  # live caps below were quietly set to 2 GB / 30 days, making both claims
+  # false in production. 5 GB (`maxSize`) is a deliberately conservative
+  # ceiling, not the box's literal free-disk ceiling — `box` (130.61.180.42)
+  # only had ~7.9 GB free system-wide as of 2026-10-23, shared with every
+  # other live product on the box, so setting this any higher risks a
+  # single upload taking down unrelated products. `maxExpiration: 0 days`
+  # means unlimited (creators can pick "never"), matching the always-live
+  # "including never" claim. These numbers MUST match
+  # backend/src/constants.ts's MARKETING_CLAIMED_MAX_SIZE_BYTES /
+  # MARKETING_CLAIMED_MAX_EXPIRATION_DAYS and
+  # frontend/src/constants/marketingLimits.ts — ConfigService logs a
+  # warning at boot if they ever drift apart again.
+  maxExpiration: 0 days
   defaultExpiration: 7 days
   shareIdLength: "8"
-  maxSize: "2000000000"
+  maxSize: "5000000000"
   zipCompressionLevel: "6"
   chunkSize: "10000000"
   fileRetentionPeriod: 0 days

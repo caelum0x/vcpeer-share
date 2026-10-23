@@ -52,7 +52,7 @@ export default {
   "wetransferAlternative.table.row.account.them": "No, but nagged to sign up",
   "wetransferAlternative.table.row.size.feature": "File size limit",
   "wetransferAlternative.table.row.size.us":
-    "None enforced by the app — limited only by your server's disk space",
+    "Up to 5 GB per transfer on share.vcpeer.com (self-host it for your own server's disk limit instead)",
   "wetransferAlternative.table.row.size.them": "2 GB per transfer",
   "wetransferAlternative.table.row.expiry.feature": "Link expiry",
   "wetransferAlternative.table.row.expiry.us":
@@ -93,6 +93,120 @@ export default {
   "wetransferAlternative.related.book":
     "Sending files ahead of a meeting? <a>Book a free scheduling link</a> to go with it.",
   // END /wetransfer-alternative
+
+  // /smash-alternative
+  "smashAlternative.title": "Looking for a <h>Smash alternative</h>?",
+  "smashAlternative.description":
+    "Send files free without your transfer getting queued behind paying customers once it crosses 2 GB. Open-source, password-protectable, and yours to self-host.",
+  "smashAlternative.button.start": "Send a file free",
+
+  "smashAlternative.table.title": "VCPeer Send vs. Smash",
+  "smashAlternative.table.feature": "Feature",
+  "smashAlternative.table.us": "VCPeer Send",
+  "smashAlternative.table.them": "Smash (free plan)",
+  "smashAlternative.table.row.account.feature": "Account required",
+  "smashAlternative.table.row.account.us": "Never",
+  "smashAlternative.table.row.account.them": "No, but nagged to sign up",
+  "smashAlternative.table.row.size.feature": "File size limit",
+  "smashAlternative.table.row.size.us": "Up to 5 GB per transfer",
+  "smashAlternative.table.row.size.them": "2 GB per transfer",
+  "smashAlternative.table.row.queue.feature": "Priority delivery",
+  "smashAlternative.table.row.queue.us":
+    "Every transfer is delivered the same way, no matter the size",
+  "smashAlternative.table.row.queue.them":
+    "Transfers over 2 GB are queued behind Pro ($4.80+/mo) senders",
+  "smashAlternative.table.row.expiry.feature": "Link expiry",
+  "smashAlternative.table.row.expiry.us":
+    "You choose — including \"never\"",
+  "smashAlternative.table.row.expiry.them": "Fixed at 7 days",
+  "smashAlternative.table.row.password.feature": "Password-protect a link",
+  "smashAlternative.table.row.password.us": "Yes, free",
+  "smashAlternative.table.row.password.them": "Yes, free",
+  "smashAlternative.table.row.source.feature": "Source code",
+  "smashAlternative.table.row.source.us": "Open-source, audit it yourself",
+  "smashAlternative.table.row.source.them": "Closed-source",
+
+  "smashAlternative.faq.title": "Frequently asked questions",
+  "smashAlternative.faq.q1":
+    "Does my transfer get deprioritized if it's large?",
+  "smashAlternative.faq.a1":
+    "No. Every share is delivered the same way regardless of size — there is no paid tier that jumps ahead of free transfers.",
+  "smashAlternative.faq.q2": "Is it really free, with no catch?",
+  "smashAlternative.faq.a2":
+    "Yes. Password protection, visitor limits, expiry control, and recipient notifications are all available without an account or a paid plan.",
+  "smashAlternative.faq.q3": "What happens when a link expires?",
+  "smashAlternative.faq.a3":
+    "The files are removed and the link shows a clear \"no longer available\" message instead of a confusing error.",
+  "smashAlternative.faq.q4": "Can I self-host this instead?",
+  "smashAlternative.faq.a4":
+    "Yes — the full source is on GitHub under a permissive license, so you can run your own instance instead of using share.vcpeer.com.",
+
+  "smashAlternative.related.title": "Related",
+  "smashAlternative.related.live":
+    "Need to talk while you send files? <a>VCPeer Live</a> runs multistream video calls on the same open-source stack.",
+  "smashAlternative.related.book":
+    "Sending files ahead of a meeting? <a>Book a free scheduling link</a> to go with it.",
+  // END /smash-alternative
+
+  // /swisstransfer-alternative
+  "swisstransferAlternative.title":
+    "Looking for a <h>SwissTransfer alternative</h>?",
+  "swisstransferAlternative.description":
+    "Send files free with password protection and visitor limits SwissTransfer doesn't offer at any price, self-hosted on infrastructure you control.",
+  "swisstransferAlternative.button.start": "Send a file free",
+
+  "swisstransferAlternative.table.title": "VCPeer Send vs. SwissTransfer",
+  "swisstransferAlternative.table.feature": "Feature",
+  "swisstransferAlternative.table.us": "VCPeer Send",
+  "swisstransferAlternative.table.them": "SwissTransfer",
+  "swisstransferAlternative.table.row.account.feature": "Account required",
+  "swisstransferAlternative.table.row.account.us": "Never",
+  "swisstransferAlternative.table.row.account.them": "Never",
+  "swisstransferAlternative.table.row.size.feature": "File size limit",
+  "swisstransferAlternative.table.row.size.us": "Up to 5 GB per transfer",
+  "swisstransferAlternative.table.row.size.them":
+    "50 GB per transfer, with no way to pay for more",
+  "swisstransferAlternative.table.row.password.feature":
+    "Password-protect a link",
+  "swisstransferAlternative.table.row.password.us": "Yes, free",
+  "swisstransferAlternative.table.row.password.them":
+    "Not offered, at any price",
+  "swisstransferAlternative.table.row.views.feature": "Visitor/download limits",
+  "swisstransferAlternative.table.row.views.us":
+    "Set a max view count per link, free",
+  "swisstransferAlternative.table.row.views.them": "Not offered",
+  "swisstransferAlternative.table.row.ownership.feature": "Where files live",
+  "swisstransferAlternative.table.row.ownership.us":
+    "Your own server — you control retention and access",
+  "swisstransferAlternative.table.row.ownership.them":
+    "Infomaniak's servers, under their terms",
+  "swisstransferAlternative.table.row.source.feature": "Source code",
+  "swisstransferAlternative.table.row.source.us":
+    "Open-source, audit it yourself",
+  "swisstransferAlternative.table.row.source.them": "Closed-source",
+
+  "swisstransferAlternative.faq.title": "Frequently asked questions",
+  "swisstransferAlternative.faq.q1":
+    "Can I password-protect a link like I can't on SwissTransfer?",
+  "swisstransferAlternative.faq.a1":
+    "Yes, for free, on every share — no account or paid plan required.",
+  "swisstransferAlternative.faq.q2":
+    "Can I limit how many times a link can be viewed?",
+  "swisstransferAlternative.faq.a2":
+    "Yes. Set a maximum view count when creating a share and the link stops working once it's reached, free.",
+  "swisstransferAlternative.faq.q3": "Is SwissTransfer's 50 GB cap bigger?",
+  "swisstransferAlternative.faq.a3":
+    "Yes, per transfer — but it comes with no password protection, no visitor limits, and no way to self-host or audit the code. VCPeer Send trades a smaller free cap for real security controls and a fully open codebase.",
+  "swisstransferAlternative.faq.q4": "Can I run my own instance instead?",
+  "swisstransferAlternative.faq.a4":
+    "Yes — the full source is on GitHub under a permissive license, unlike SwissTransfer's closed-source service.",
+
+  "swisstransferAlternative.related.title": "Related",
+  "swisstransferAlternative.related.live":
+    "Need to talk while you send files? <a>VCPeer Live</a> runs multistream video calls on the same open-source stack.",
+  "swisstransferAlternative.related.book":
+    "Sending files ahead of a meeting? <a>Book a free scheduling link</a> to go with it.",
+  // END /swisstransfer-alternative
 
   // /auth/signin
   "signin.title": "Welcome back",
@@ -248,6 +362,23 @@ export default {
   "account.shares.table.shared-with-recipients": "Shared with recipients",
   "account.shares.table.visitor-count": "{count} of {max}",
   "account.shares.table.expiry-never": "Never",
+  "account.shares.table.source.live": "via VCPeer Live",
+  "account.shares.table.source.booking": "via booking",
+
+  "account.shares.button.analytics": "View analytics",
+  "account.shares.analytics.title": "Share analytics",
+  "account.shares.analytics.title.withId": "Analytics for {id}",
+  "account.shares.analytics.error.denied":
+    "This share doesn't exist, or you don't have access to its analytics.",
+  "account.shares.analytics.stat.views": "Views",
+  "account.shares.analytics.stat.downloads": "Downloads",
+  "account.shares.analytics.stat.uniqueVisitors": "Unique visitors",
+  "account.shares.analytics.stat.expiresIn": "Expires in",
+  "account.shares.analytics.expiry.expired": "Expired",
+  "account.shares.analytics.chart.title": "Views and downloads over time",
+  "account.shares.analytics.chart.empty": "No activity yet on this share.",
+  "account.shares.analytics.countries.title": "Top countries",
+  "account.shares.analytics.referrers.title": "Top referrers",
 
   "account.shares.modal.share-informations": "Share information",
   "account.shares.modal.share-link": "Share link",

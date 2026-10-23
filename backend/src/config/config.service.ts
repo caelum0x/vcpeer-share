@@ -9,12 +9,17 @@ import { Config } from "@prisma/client";
 import * as argon from "argon2";
 import { EventEmitter } from "events";
 import * as fs from "fs";
+import * as moment from "moment";
 import { PrismaService } from "src/prisma/prisma.service";
-import { stringToTimespan } from "src/utils/date.util";
+import { stringToTimespan, timespanToString } from "src/utils/date.util";
 import { parse as yamlParse } from "yaml";
 import { I18nContext } from "nestjs-i18n";
 import { YamlConfig } from "../../prisma/seed/config.seed";
-import { CONFIG_FILE } from "src/constants";
+import {
+  CONFIG_FILE,
+  MARKETING_CLAIMED_MAX_EXPIRATION_DAYS,
+  MARKETING_CLAIMED_MAX_SIZE_BYTES,
+} from "src/constants";
 
 export const LEGACY_CONFIG_ALIASES: Record<
   string,
@@ -70,6 +75,50 @@ export class ConfigService extends EventEmitter {
 
     if (this.yamlConfig) {
       await this.migrateInitUser();
+    }
+
+    this.checkMarketingClaimsConsistency();
+  }
+
+  // The /wetransfer-alternative, /smash-alternative and
+  // /swisstransfer-alternative landing pages advertise specific numbers for
+  // "max file size" and "link expiry" as competitive differentiators. Those
+  // numbers are hardcoded in the frontend copy (see
+  // frontend/src/constants/marketingLimits.ts) because the comparison
+  // tables need real prose, not a live API call on every page view. That
+  // means the two can silently drift apart whenever `share.maxSize` or
+  // `share.maxExpiration` is changed in config.yaml (or the admin UI)
+  // without updating the frontend's claim to match. This runs once at boot
+  // and writes a loud warning to the logs whenever that happens so the
+  // drift can't reopen silently again like it did before 2026-10-23.
+  private checkMarketingClaimsConsistency() {
+    const actualMaxSize = this.get("share.maxSize");
+    if (actualMaxSize !== MARKETING_CLAIMED_MAX_SIZE_BYTES) {
+      this.logger.warn(
+        `CONFIG DRIFT: share.maxSize is ${actualMaxSize} bytes, but the ` +
+          `landing pages advertise ${MARKETING_CLAIMED_MAX_SIZE_BYTES} bytes ` +
+          `(frontend/src/constants/marketingLimits.ts). Update one to match ` +
+          `the other before the next deploy, or the marketing copy is lying.`,
+      );
+    }
+
+    const actualMaxExpiration = this.get("share.maxExpiration");
+    const actualMaxExpirationDays =
+      actualMaxExpiration.value === 0
+        ? 0
+        : moment
+            .duration(actualMaxExpiration.value, actualMaxExpiration.unit)
+            .asDays();
+    if (actualMaxExpirationDays !== MARKETING_CLAIMED_MAX_EXPIRATION_DAYS) {
+      this.logger.warn(
+        `CONFIG DRIFT: share.maxExpiration is ${timespanToString(
+          actualMaxExpiration,
+        )} (${actualMaxExpirationDays} days, 0 = unlimited), but the ` +
+          `landing pages advertise ${MARKETING_CLAIMED_MAX_EXPIRATION_DAYS} ` +
+          `days (0 = unlimited, "including never") in ` +
+          `frontend/src/constants/marketingLimits.ts. Update one to match ` +
+          `the other before the next deploy, or the marketing copy is lying.`,
+      );
     }
   }
 
