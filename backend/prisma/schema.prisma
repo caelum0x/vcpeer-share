@@ -110,7 +110,52 @@ model Share {
   recipients     ShareRecipient[]
   userRecipients ShareUserRecipient[]
   files          File[]
+  accessEvents   ShareAccessEvent[]
   storageProvider String @default("LOCAL")
+
+  // Where this share was created from — set once at creation time by
+  // whatever cross-sell CTA deep-linked into /upload (e.g. ?ref=live from
+  // a VCPeer Live post-session screen, ?ref=booking from a Cal.com
+  // confirmation page). Null means "came directly to Send" (SEO landing
+  // pages, direct traffic, etc). Lets us finally measure the Live/booking
+  // -> Send funnel instead of only having outbound links the other way.
+  source String?
+}
+
+// Per-access analytics for a share: one row per real view or download,
+// written best-effort (never blocks or fails the actual file response) by
+// ShareAnalyticsService.recordAccess, called from ShareController.get and
+// FileController's getFile/getZip handlers once a request has already
+// passed ShareSecurityGuard/FileSecurityGuard. Lets a sender see who is
+// actually opening/downloading their share instead of only a raw view
+// counter — the #1 retention gap: there was previously zero reason for a
+// sender to come back to the product after creating a share.
+model ShareAccessEvent {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  shareId String
+  share   Share  @relation(fields: [shareId], references: [id], onDelete: Cascade)
+
+  // "view" (page opened / file previewed inline) or "download"
+  action String
+
+  // SHA-256 of the visitor's IP + a process-local salt, truncated to 16
+  // hex chars. Never store a raw IP: this is enough to approximate unique
+  // visitors without being personally identifying data at rest.
+  ipHash String
+
+  // From the `CF-IPCountry` header Cloudflare already adds to every
+  // request in front of share.vcpeer.com — no third-party GeoIP lookup,
+  // no new paid service. "XX" when the header is absent (local dev, direct
+  // IP access bypassing Cloudflare).
+  country String?
+
+  // Raw `Referer` header, truncated. Null for direct link opens.
+  referrer String?
+
+  @@index([shareId])
+  @@index([shareId, createdAt])
 }
 
 model ReverseShare {

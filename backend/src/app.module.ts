@@ -19,6 +19,7 @@ import { JobsModule } from "./jobs/jobs.module";
 import { OAuthModule } from "./oauth/oauth.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { ReverseShareModule } from "./reverseShare/reverseShare.module";
+import { ShareAnalyticsModule } from "./shareAnalytics/shareAnalytics.module";
 import { ShareModule } from "./share/share.module";
 import { UserModule } from "./user/user.module";
 import { SystemModule } from "./system/system.module";
@@ -35,6 +36,7 @@ const i18nPath = existsSync(join(__dirname, "../i18n"))
     ConfigModule,
     AuthModule,
     ShareModule,
+    ShareAnalyticsModule,
     FileModule,
     EmailModule,
     PrismaModule,

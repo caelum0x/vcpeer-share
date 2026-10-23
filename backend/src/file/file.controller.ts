@@ -20,6 +20,7 @@ import { StrictShareOwnerGuard } from "src/share/guard/strictShareOwner.guard";
 import { IdValidation } from "src/share/guard/shareIdValidation.guard";
 import { FileService } from "./file.service";
 import { FileSecurityGuard } from "./guard/fileSecurity.guard";
+import { ShareAnalyticsService } from "src/shareAnalytics/shareAnalytics.service";
 import * as mime from "mime-types";
 
 const VALID_ID_REGEX = /^[a-zA-Z0-9-]*={0,2}$/;
@@ -31,7 +32,10 @@ function getValidRecipientId(recipientId?: string): string | undefined {
 
 @Controller("shares/:shareId/files")
 export class FileController {
-  constructor(private fileService: FileService) {}
+  constructor(
+    private fileService: FileService,
+    private shareAnalyticsService: ShareAnalyticsService,
+  ) {}
 
   @Post("upload-init")
   @SkipThrottle()
@@ -120,11 +124,16 @@ export class FileController {
   @Get("zip")
   @UseGuards(FileSecurityGuard)
   async getZip(
+    @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
     @Param("shareId") shareId: string,
     @Query("recipient") recipientId?: string,
   ) {
     const zipStream = await this.fileService.getZip(shareId);
+
+    // A zip download is always a real "download" action — there is no
+    // inline-preview variant of this endpoint.
+    void this.shareAnalyticsService.recordAccess(shareId, "download", req);
 
     res.set({
       "Content-Type": "application/zip",
@@ -166,6 +175,11 @@ export class FileController {
         isDownload,
       );
       const fileName = await this.fileService.getFileName(shareId, fileId);
+      void this.shareAnalyticsService.recordAccess(
+        shareId,
+        isDownload ? "download" : "view",
+        req,
+      );
       if (isDownload) {
         void this.fileService.notifyRecipientDownload(
           shareId,
@@ -223,6 +237,17 @@ export class FileController {
     }
 
     res.set(headers);
+
+    // Only count once per file open, not once per HTTP range chunk — a
+    // single video/audio preview can trigger dozens of range requests from
+    // the browser, which would wildly inflate the view count otherwise.
+    if (!file.range) {
+      void this.shareAnalyticsService.recordAccess(
+        shareId,
+        isDownload ? "download" : "view",
+        req,
+      );
+    }
 
     if (isDownload && !file.range) {
       void this.fileService.notifyRecipientDownload(

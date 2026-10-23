@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import {
   TbPlusMinus,
   TbInfoCircle,
+  TbChartBar,
   TbLink,
   TbLock,
   TbTrash,
@@ -143,6 +144,15 @@ const MyShares = () => {
                               </span>
                             </HoverTip>
                           ) : null)}
+                        {share.source && (
+                          <HoverTip
+                            label={t(`account.shares.table.source.${share.source}`)}
+                          >
+                            <Text size="xs" color="dimmed">
+                              {t(`account.shares.table.source.${share.source}`)}
+                            </Text>
+                          </HoverTip>
+                        )}
                       </Group>
                     </td>
                     <td>{share.name}</td>
@@ -176,6 +186,15 @@ const MyShares = () => {
                               size={25}
                             >
                               <TbPlusMinus />
+                            </ActionIcon>
+                          </HoverTip>
+                        </Link>
+                        <Link href={`/account/shares/${share.id}/analytics`}>
+                          <HoverTip
+                            label={t("account.shares.button.analytics")}
+                          >
+                            <ActionIcon color="teal" variant="light" size={25}>
+                              <TbChartBar />
                             </ActionIcon>
                           </HoverTip>
                         </Link>

@@ -39,12 +39,14 @@ import { ShareTokenSecurity } from "./guard/shareTokenSecurity.guard";
 import { IdValidation } from "./guard/shareIdValidation.guard";
 import { ShareService } from "./share.service";
 import { CompletedShareDTO } from "./dto/shareComplete.dto";
+import { ShareAnalyticsService } from "src/shareAnalytics/shareAnalytics.service";
 @Controller("shares")
 export class ShareController {
   constructor(
     private shareService: ShareService,
     private jwtService: JwtService,
     private config: ConfigService,
+    private shareAnalyticsService: ShareAnalyticsService,
   ) {}
 
   @Get("all")
@@ -71,7 +73,11 @@ export class ShareController {
 
   @Get(":id")
   @UseGuards(IdValidation, ShareSecurityGuard)
-  async get(@Param("id") id: string) {
+  async get(@Param("id") id: string, @Req() req: Request) {
+    // Fire-and-forget: this is the "share page opened" signal for
+    // per-share analytics. Guard has already granted access by this
+    // point, so every call here is a real, authorized view.
+    void this.shareAnalyticsService.recordAccess(id, "view", req);
     return new ShareDTO().from(await this.shareService.get(id));
   }
 

@@ -28,6 +28,10 @@ export type CreateShare = {
   expiration: string;
   security: ShareSecurity;
   size?: number;
+  // Where this share was created from — "live" or "booking" when the
+  // upload page was opened via a cross-sell CTA's ?ref= deep link, unset
+  // for direct traffic / SEO landing pages.
+  source?: string;
 };
 
 export type UpdateShare = {
@@ -52,6 +56,8 @@ export type MyShare = Omit<Share, "hasPassword"> & {
   createdAt: Date;
   recipients: string[];
   security: MyShareSecurity;
+  // "live" | "booking" | undefined — see CreateShare.source.
+  source?: string;
 };
 
 export type MyReverseShare = {
@@ -75,4 +81,31 @@ export type MyShareSecurity = {
   maxViews?: number;
   restrictToRecipients: boolean;
   notifyOnDownload: boolean;
+};
+
+export type ShareAnalyticsCountryBreakdown = {
+  country: string;
+  count: number;
+};
+
+export type ShareAnalyticsReferrerBreakdown = {
+  referrer: string;
+  count: number;
+};
+
+export type ShareAnalyticsTimelineEntry = {
+  date: string;
+  views: number;
+  downloads: number;
+};
+
+export type ShareAnalytics = {
+  totalViews: number;
+  totalDownloads: number;
+  uniqueVisitors: number;
+  topCountries: ShareAnalyticsCountryBreakdown[];
+  topReferrers: ShareAnalyticsReferrerBreakdown[];
+  timeline: ShareAnalyticsTimelineEntry[];
+  expiresAt: Date | null;
+  expiresInMs: number | null;
 };
