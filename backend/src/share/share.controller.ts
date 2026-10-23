@@ -19,6 +19,7 @@ import * as moment from "moment";
 import { GetUser } from "src/auth/decorator/getUser.decorator";
 import { AdministratorGuard } from "src/auth/guard/isAdmin.guard";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
+import { JwtOrApiKeyGuard } from "src/auth/guard/jwtOrApiKey.guard";
 import { ConfigService } from "src/config/config.service";
 import { AdminShareDTO } from "./dto/adminShare.dto";
 import { CreateShareDTO } from "./dto/createShare.dto";
@@ -56,7 +57,7 @@ export class ShareController {
   }
 
   @Get()
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtOrApiKeyGuard)
   async getMyShares(@GetUser() user: User) {
     return new MyShareDTO().fromList(
       await this.shareService.getSharesByUser(user.id),

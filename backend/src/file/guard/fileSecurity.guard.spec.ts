@@ -8,6 +8,7 @@ describe("FileSecurityGuard", () => {
   let prisma: any;
   let shareService: any;
   let config: any;
+  let apiKeyService: any;
   let i18n: any;
   let guard: FileSecurityGuard;
 
@@ -55,7 +56,17 @@ describe("FileSecurityGuard", () => {
       t: jest.fn((key: string) => key),
     };
 
-    guard = new FileSecurityGuard(shareService, prisma, config, i18n);
+    apiKeyService = {
+      authenticate: jest.fn().mockResolvedValue(null),
+    };
+
+    guard = new FileSecurityGuard(
+      shareService,
+      prisma,
+      config,
+      apiKeyService,
+      i18n,
+    );
     // JwtGuard.canActivate (inherited) hits passport internals we don't want
     // to bootstrap for this unit test; stub authenticateUser like the
     // public-access code path expects (anonymous visitor).

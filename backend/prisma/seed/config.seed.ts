@@ -66,6 +66,16 @@ export const configVariables = {
       defaultValue: "false",
       secret: false,
     },
+    enableApiKeys: {
+      type: "boolean",
+      defaultValue: "true",
+      secret: false,
+    },
+    maxApiKeysPerUser: {
+      type: "number",
+      defaultValue: "10",
+      secret: false,
+    },
     customPasswordPolicy: {
       type: "boolean",
       defaultValue: "false",

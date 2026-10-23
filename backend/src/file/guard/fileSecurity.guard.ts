@@ -8,6 +8,7 @@ import {
 import { Request } from "express";
 import * as moment from "moment";
 import { I18nService } from "nestjs-i18n";
+import { ApiKeyService } from "src/apiKey/apiKey.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { ShareSecurityGuard } from "src/share/guard/shareSecurity.guard";
 import { ShareService } from "src/share/share.service";
@@ -19,9 +20,10 @@ export class FileSecurityGuard extends ShareSecurityGuard {
     private _shareService: ShareService,
     private _prisma: PrismaService,
     private _config: ConfigService,
+    _apiKeyService: ApiKeyService,
     private readonly _i18n: I18nService,
   ) {
-    super(_shareService, _prisma, _config, _i18n);
+    super(_shareService, _prisma, _config, _apiKeyService, _i18n);
   }
 
   isBase64(toCheck: string) {

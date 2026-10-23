@@ -10,6 +10,7 @@ export default {
   "navbar.links.received": "Received shares",
 
   "navbar.avatar.account": "My account",
+  "navbar.avatar.api-keys": "API keys",
   "navbar.avatar.admin": "Administration",
   "navbar.avatar.signout": "Sign out",
   // END navbar
@@ -464,6 +465,42 @@ export default {
     "Do you really want to delete this reverse share and all associated shares?",
 
   // END /account/reverseShares
+
+  // /account/apiKeys
+  "account.apiKeys.title": "API keys",
+  "account.apiKeys.description":
+    "API keys let scripts and other tools create and manage shares on your behalf without signing in through the browser. Send a key as 'Authorization: Bearer <key>' or 'x-api-key: <key>'.",
+
+  "account.apiKeys.title.empty": "No API keys yet",
+  "account.apiKeys.description.empty":
+    "Create one to call the Send API from scripts, CI jobs, or other tools.",
+
+  "account.apiKeys.table.name": "Name",
+  "account.apiKeys.table.created": "Created",
+  "account.apiKeys.table.last-used": "Last used",
+  "account.apiKeys.table.expires": "Expires",
+  "account.apiKeys.table.expired": "Expired",
+  "account.apiKeys.table.never-used": "Never used",
+  "account.apiKeys.table.no-expiry": "Never",
+
+  "account.apiKeys.modal.create.title": "Create API key",
+  "account.apiKeys.modal.create.name": "Name",
+  "account.apiKeys.modal.create.name-placeholder": "e.g. CI pipeline",
+  "account.apiKeys.modal.create.expiry": "Expires after",
+  "account.apiKeys.modal.create.expiry.days": "{days} days",
+  "account.apiKeys.modal.create.expiry.never": "Never",
+
+  "account.apiKeys.modal.token.title": "API key created",
+  "account.apiKeys.modal.token.warning":
+    "Copy this key now — it won't be shown again. Treat it like a password.",
+  "account.apiKeys.modal.token.copy": "Copy to clipboard",
+  "account.apiKeys.modal.token.copied": "Copied to clipboard",
+  "account.apiKeys.modal.token.done": "Done",
+
+  "account.apiKeys.modal.revoke.title": "Revoke API key",
+  "account.apiKeys.modal.revoke.description":
+    "Do you really want to revoke this API key? Anything using it will stop working immediately.",
+  // END /account/apiKeys
 
   // /admin
   "admin.title": "Administration",
@@ -932,6 +969,12 @@ export default {
     "Force reverse shares to be created in simple mode. If disabled, the creator of the reverse share can choose between simple and advanced mode.",
   "admin.config.security.allow-admin-access-all-shares.description":
     "Allow administrators to access all shares, even if they are password protected, expired or deleted.",
+  "admin.config.security.enable-api-keys": "Enable API keys",
+  "admin.config.security.enable-api-keys.description":
+    "Allow users to create personal API keys to create and manage shares without signing in through the browser.",
+  "admin.config.security.max-api-keys-per-user": "Max API keys per user",
+  "admin.config.security.max-api-keys-per-user.description":
+    "The maximum number of active API keys a single user can have at once. Set to 0 for unlimited.",
   "admin.config.share.enable-user-recipients":
     "Enable sharing with registered users",
   "admin.config.share.enable-user-recipients.description":

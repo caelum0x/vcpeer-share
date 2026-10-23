@@ -1,0 +1,5 @@
+{
+  "notFound": "API key not found",
+  "disabled": "API keys are disabled",
+  "maxApiKeysExceeded": "Maximum active API keys limit ({max}) reached"
+}

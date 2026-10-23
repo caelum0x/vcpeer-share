@@ -31,6 +31,7 @@ model User {
   reverseShares       ReverseShare[]
   shareUserRecipients ShareUserRecipient[]
   adminNoticeDismissals AdminNoticeDismissal[]
+  apiKeys             ApiKey[]
 
   totpEnabled        Boolean             @default(false)
   totpVerified       Boolean             @default(false)
@@ -182,6 +183,27 @@ model ReverseShare {
   creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 
   shares Share[]
+}
+
+// A developer-facing personal access token. Lets a user authenticate the
+// public API (creating/listing/updating shares, uploading files) without a
+// browser session cookie — `vcp_<keyId>.<secret>` is shown once on
+// creation; only an argon2 hash of the secret half is ever persisted. The
+// plaintext `keyId` half is kept so a key can be looked up and verified in
+// one query without scanning every row.
+model ApiKey {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name       String
+  keyId      String    @unique
+  secretHash String
+  lastUsedAt DateTime?
+  expiresAt  DateTime?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model ShareRecipient {

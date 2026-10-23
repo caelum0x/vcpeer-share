@@ -253,6 +253,10 @@ const Header = () => {
       link: "/account",
       label: t("navbar.avatar.account"),
     },
+    {
+      link: "/account/apiKeys",
+      label: t("navbar.avatar.api-keys"),
+    },
     ...(user?.isAdmin
       ? [
           {

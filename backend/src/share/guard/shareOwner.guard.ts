@@ -7,18 +7,20 @@ import {
 import { User } from "@prisma/client";
 import { Request } from "express";
 import { I18nService } from "nestjs-i18n";
+import { ApiKeyService } from "src/apiKey/apiKey.service";
 import { ConfigService } from "src/config/config.service";
 import { PrismaService } from "src/prisma/prisma.service";
-import { JwtGuard } from "../../auth/guard/jwt.guard";
+import { JwtOrApiKeyGuard } from "../../auth/guard/jwtOrApiKey.guard";
 
 @Injectable()
-export class ShareOwnerGuard extends JwtGuard {
+export class ShareOwnerGuard extends JwtOrApiKeyGuard {
   constructor(
     configService: ConfigService,
+    apiKeyService: ApiKeyService,
     private prisma: PrismaService,
     private readonly i18n: I18nService,
   ) {
-    super(configService);
+    super(configService, apiKeyService);
   }
 
   isBase64(toCheck: string) {

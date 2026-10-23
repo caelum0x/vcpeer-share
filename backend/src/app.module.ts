@@ -10,6 +10,7 @@ import { I18nModule } from "nestjs-i18n";
 import { APP_GUARD } from "@nestjs/core";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { AppCacheModule } from "./cache/cache.module";
+import { ApiKeyModule } from "./apiKey/apiKey.module";
 import { AppController } from "./app.controller";
 import { ClamScanModule } from "./clamscan/clamscan.module";
 import { ConfigModule } from "./config/config.module";
@@ -34,6 +35,7 @@ const i18nPath = existsSync(join(__dirname, "../i18n"))
 @Module({
   imports: [
     ConfigModule,
+    ApiKeyModule,
     AuthModule,
     ShareModule,
     ShareAnalyticsModule,

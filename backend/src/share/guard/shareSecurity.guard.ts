@@ -10,18 +10,20 @@ import { I18nService } from "nestjs-i18n";
 import { PrismaService } from "src/prisma/prisma.service";
 import { ShareService } from "src/share/share.service";
 import { ConfigService } from "src/config/config.service";
-import { JwtGuard } from "src/auth/guard/jwt.guard";
+import { JwtOrApiKeyGuard } from "src/auth/guard/jwtOrApiKey.guard";
+import { ApiKeyService } from "src/apiKey/apiKey.service";
 import { User } from "@prisma/client";
 
 @Injectable()
-export class ShareSecurityGuard extends JwtGuard {
+export class ShareSecurityGuard extends JwtOrApiKeyGuard {
   constructor(
     private shareService: ShareService,
     private prisma: PrismaService,
     private configService: ConfigService,
+    apiKeyService: ApiKeyService,
     private readonly i18n: I18nService,
   ) {
-    super(configService);
+    super(configService, apiKeyService);
   }
 
   protected async authenticateUser(

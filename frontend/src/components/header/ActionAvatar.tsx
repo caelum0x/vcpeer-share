@@ -1,6 +1,12 @@
 import { ActionIcon, Avatar, Menu } from "@mantine/core";
 import Link from "next/link";
-import { TbDoorExit, TbSettings, TbUser, TbUserCircle } from "react-icons/tb";
+import {
+  TbDoorExit,
+  TbKey,
+  TbSettings,
+  TbUser,
+  TbUserCircle,
+} from "react-icons/tb";
 import useUser from "../../hooks/user.hook";
 import authService from "../../services/auth.service";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -25,6 +31,13 @@ const ActionAvatar = () => {
       <Menu.Dropdown>
         <Menu.Item component={Link} href="/account" icon={<TbUser size={14} />}>
           <FormattedMessage id="navbar.avatar.account" />
+        </Menu.Item>
+        <Menu.Item
+          component={Link}
+          href="/account/apiKeys"
+          icon={<TbKey size={14} />}
+        >
+          <FormattedMessage id="navbar.avatar.api-keys" />
         </Menu.Item>
         {user!.isAdmin && (
           <Menu.Item
