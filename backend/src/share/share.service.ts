@@ -542,6 +542,13 @@ export class ShareService {
       description:
         body.description !== undefined ? body.description || null : undefined,
       expiration: expirationDate,
+      // Changing the expiration (extending or shortening it) makes this
+      // share eligible for a fresh expiration-reminder email again — without
+      // this, a sender who extends a share right after getting the
+      // reminder would never be reminded a second time before the new,
+      // later expiration.
+      expirationReminderSentAt:
+        expirationDate !== undefined ? null : undefined,
     };
 
     await this.prisma.share.update({

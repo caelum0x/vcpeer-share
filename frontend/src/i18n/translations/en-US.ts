@@ -863,6 +863,14 @@ export default {
     "Enable download notifications",
   "admin.config.share.enable-share-download-notifications.description":
     "Whether to send an email to the share creator when an email recipient downloads a file. This requires SMTP and email recipient sharing.",
+  "admin.config.share.enable-share-expiration-reminders":
+    "Enable share expiration reminders",
+  "admin.config.share.enable-share-expiration-reminders.description":
+    "Whether to email a share's creator once, shortly before it expires, so they can extend it or re-download the files in time. Requires SMTP.",
+  "admin.config.share.expiration-reminder-threshold":
+    "Expiration reminder threshold",
+  "admin.config.share.expiration-reminder-threshold.description":
+    "How long before a share expires to send the reminder email, e.g. 1 day before expiration.",
   "admin.config.email.share-download-notification-subject":
     "Download notification subject",
   "admin.config.email.share-download-notification-subject.description":
@@ -871,6 +879,14 @@ export default {
     "Download notification message",
   "admin.config.email.share-download-notification-message.description":
     "Message which gets sent to the share creator when a recipient downloads a file. Available variables:\n {recipient} - The name and email of the recipient\n {recipientEmail} - The email of the recipient\n {fileName} - The downloaded file name\n {creator} - The creator's name\n {shareUrl} - The URL of the share",
+  "admin.config.email.share-expiration-reminder-subject":
+    "Expiration reminder subject",
+  "admin.config.email.share-expiration-reminder-subject.description":
+    "Subject of the email sent to a share's creator shortly before it expires. Available variables:\n {expiresIn} - How soon the share expires (e.g. \"in a day\")",
+  "admin.config.email.share-expiration-reminder-message":
+    "Expiration reminder message",
+  "admin.config.email.share-expiration-reminder-message.description":
+    "Message sent to a share's creator shortly before it expires. Available variables:\n {name} - The creator's display name or username\n {shareName} - The share's name\n {fileCount} - Number of files in the share\n {expiresIn} - How soon the share expires\n {shareUrl} - The public URL of the share\n {manageUrl} - The URL to the share's analytics/management page",
   "admin.config.security.enable-email-verification":
     "Enable email verification",
   "admin.config.security.enable-email-verification.description":

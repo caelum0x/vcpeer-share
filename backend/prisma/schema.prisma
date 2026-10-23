@@ -120,6 +120,14 @@ model Share {
   // pages, direct traffic, etc). Lets us finally measure the Live/booking
   // -> Send funnel instead of only having outbound links the other way.
   source String?
+
+  // Set once JobsService's sendShareExpirationReminders cron sends the
+  // "your share expires soon" email to this share's creator. Null means no
+  // reminder has gone out yet. Prevents re-sending the same reminder every
+  // time the job runs before the share actually expires or is renewed.
+  // Cleared back to null whenever the share's expiration is pushed out via
+  // PATCH, so an extended share becomes eligible for a fresh reminder.
+  expirationReminderSentAt DateTime?
 }
 
 // Per-access analytics for a share: one row per real view or download,

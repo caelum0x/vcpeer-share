@@ -2,6 +2,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import * as fs from "fs";
 import * as moment from "moment";
+import { EmailService } from "src/email/email.service";
 import { FileService } from "src/file/file.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { ReverseShareService } from "src/reverseShare/reverseShare.service";
@@ -17,6 +18,7 @@ export class JobsService {
     private reverseShareService: ReverseShareService,
     private fileService: FileService,
     private configServer: ConfigService,
+    private emailService: EmailService,
   ) {}
 
   @Cron("* * * * *")
@@ -52,6 +54,81 @@ export class JobsService {
 
     if (expiredShares.length > 0) {
       this.logger.log(`Deleted ${expiredShares.length} expired shares`);
+    }
+  }
+
+  // Sends a "your share expires soon" email to a share's creator once,
+  // shortly before it actually expires. This is the single biggest
+  // retention/re-engagement gap identified for VCPeer Send: today a sender
+  // who doesn't bookmark their own link has zero reason to come back to
+  // share.vcpeer.com before the file disappears for good, and no way to
+  // extend it in time if they still need it. Runs every 15 minutes so the
+  // reminder lands close to the configured threshold instead of drifting by
+  // up to an hour.
+  @Cron("*/15 * * * *")
+  async sendShareExpirationReminders() {
+    if (
+      !this.configServer.get("smtp.enabled") ||
+      !this.configServer.get("share.enableShareExpirationReminders")
+    ) {
+      return;
+    }
+
+    const threshold = this.configServer.get(
+      "share.expirationReminderThreshold",
+    );
+    const now = moment();
+    const windowEnd = now.clone().add(threshold.value, threshold.unit).toDate();
+
+    const sharesNearingExpiration = await this.prisma.share.findMany({
+      where: {
+        creatorId: { not: null },
+        expirationReminderSentAt: null,
+        uploadLocked: true,
+        AND: [
+          { expiration: { gt: now.toDate() } },
+          { expiration: { lte: windowEnd } },
+          // "never" expiration is stored as the unix epoch (moment(0)),
+          // same sentinel used by deleteExpiredShares above — those shares
+          // are never "nearing" anything and must never match here.
+          { expiration: { not: moment(0).toDate() } },
+        ],
+      },
+      include: { creator: true, files: true },
+    });
+
+    let remindersSent = 0;
+    for (const share of sharesNearingExpiration) {
+      if (!share.creator?.email) continue;
+
+      try {
+        await this.emailService.sendShareExpirationReminder(
+          share.creator.email,
+          share.id,
+          share.name,
+          share.files.length,
+          share.expiration,
+          share.creator.displayName || share.creator.username,
+        );
+        await this.prisma.share.update({
+          where: { id: share.id },
+          data: { expirationReminderSentAt: new Date() },
+        });
+        remindersSent++;
+      } catch (e) {
+        // Best-effort: one SMTP hiccup or bad address must not stop the
+        // reminder from going out to every other share in this batch, and
+        // must not mark this share as reminded so it gets retried on the
+        // next tick.
+        this.logger.error(
+          `Failed to send expiration reminder for share ${share.id}`,
+          e,
+        );
+      }
+    }
+
+    if (remindersSent > 0) {
+      this.logger.log(`Sent ${remindersSent} share expiration reminders`);
     }
   }
 

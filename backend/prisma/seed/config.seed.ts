@@ -140,6 +140,16 @@ export const configVariables = {
       defaultValue: "false",
       secret: false,
     },
+    enableShareExpirationReminders: {
+      type: "boolean",
+      defaultValue: "true",
+      secret: false,
+    },
+    expirationReminderThreshold: {
+      type: "timespan",
+      defaultValue: "1 days",
+      secret: false,
+    },
     enableUserRecipients: {
       type: "boolean",
       defaultValue: "false",
@@ -272,6 +282,15 @@ export const configVariables = {
       type: "text",
       defaultValue:
         "Hey!\n\n{fileName} was just downloaded from your share: {shareUrl}\n\nVCPeer Send",
+    },
+    shareExpirationReminderSubject: {
+      type: "string",
+      defaultValue: "Your share expires {expiresIn}",
+    },
+    shareExpirationReminderMessage: {
+      type: "text",
+      defaultValue:
+        "Hey {name}!\n\nYour share \"{shareName}\" ({fileCount} file(s)) expires {expiresIn}. After that, the link and files are gone for good.\n\nStill need it? Open it and extend the expiration before it's too late: {manageUrl}\n\nShare link: {shareUrl}\n\nVCPeer Send",
     },
     verificationSubject: {
       type: "string",

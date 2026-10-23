@@ -2,6 +2,7 @@
   "shareRecipientsCreatorFallback": "Someone",
   "shareRecipientsDescFallback": "No description",
   "shareRecipientsExpiresNeverFallback": "in: never",
+  "shareExpirationReminderNameFallback": "Untitled share",
   "smtpDisabled": "SMTP is disabled",
   "emailServiceDisabled": "Email service disabled",
   "testSubject": "Test email",

@@ -306,6 +306,47 @@ export class EmailService {
     );
   }
 
+  async sendShareExpirationReminder(
+    recipientEmail: string,
+    shareId: string,
+    shareName: string | undefined,
+    fileCount: number,
+    expiration: Date,
+    recipientName?: string,
+  ) {
+    const shareUrl = `${this.config.get("general.appUrl")}/s/${shareId}`;
+    const manageUrl = `${this.config.get(
+      "general.appUrl",
+    )}/account/shares/${shareId}/analytics`;
+    const lang = this.config.get("general.defaultLanguage");
+    const locale = this.i18n.translate("email.locale", { lang });
+    const expiresIn = moment(expiration).locale(locale).fromNow();
+
+    const vars = {
+      name: recipientName ?? "",
+      shareName: shareName ?? this.i18n.t("email.shareExpirationReminderNameFallback"),
+      fileCount: String(fileCount),
+      expiresIn,
+      shareUrl,
+      manageUrl,
+      email: recipientEmail,
+    };
+
+    await this.sendMail(
+      recipientEmail,
+      this.formatTemplate(
+        this.config.get("email.shareExpirationReminderSubject"),
+        vars,
+      ),
+      this.formatTemplate(
+        this.config.get("email.shareExpirationReminderMessage"),
+        vars,
+      ),
+      undefined,
+      recipientName,
+    );
+  }
+
   async sendTestMail(recipientEmail: string) {
     const subject = this.i18n.t("email.testSubject");
     const text = this.i18n.t("email.testText");
