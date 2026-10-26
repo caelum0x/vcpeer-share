@@ -7,18 +7,17 @@ below describing a future first-time deploy are kept for disaster-recovery
 original choice (`89.168.106.142`) was corrected before that first deploy —
 see "Current deployment" for where this actually runs.
 
-Follows the same shape as `/Users/arhansubasi/products/vcpeer/deploy/README.md`
-(the MiroTalk-fork runbook) for consistency across the two VCPeer products.
+Follows the same shape as the `vcpeer` (MiroTalk-fork) repo's `deploy/README.md`
+for consistency across the two VCPeer products.
 
 ## What this is
 
 VCPeer Send = the "Send a link" product in the VCPeer suite. It is an adopted
 fork of **Pingvin Share X** (`smp46/pingvin-share-x`, BSD-2-Clause, active fork
 of the now-archived original Pingvin Share) — not hand-written code. See
-`README.md` and `NOTICE.md` for upstream credit, and
-`/Users/arhansubasi/products/plans/vcpeer.md` → "Send a link = adopted OSS
-(2026-10-15)" for why it was picked over Erugo / psitransfer / timvisee/send /
-Gokapi.
+`README.md` and `NOTICE.md` for upstream credit. Picked over Erugo /
+psitransfer / timvisee/send / Gokapi for closer WeTransfer-style UX and
+active maintenance.
 
 It runs as a single prebuilt multi-arch Docker image
 (`ghcr.io/smp46/pingvin-share-x:v2.0.0`, `linux/amd64` + `linux/arm64`) — no

@@ -8,11 +8,18 @@ by smp46, itself a fork of the original
 [Pingvin Share](https://github.com/stonith404/pingvin-share) by stonith404
 (archived). Licensed BSD-2-Clause — see `LICENSE` and `NOTICE.md` for full
 upstream credit. We adopted this project rather than hand-rolling a transfer
-pipeline: see `/Users/arhansubasi/products/plans/vcpeer.md` for why it was
-chosen over Erugo, psitransfer, timvisee/send, and Gokapi.
+pipeline, chosen over Erugo, psitransfer, timvisee/send, and Gokapi for its
+closer WeTransfer-style UX (named recipients + download notifications) and
+active maintenance.
 
 Deploys at **share.vcpeer.com**, linked from `vcpeer.com/send`. Deploy guide:
 `deploy/RUNBOOK.md`.
+
+## Status
+
+No longer under active feature development by the original team — open
+sourced so others can fork, self-host, or build on it. Issues and PRs
+welcome.
 
 ---
 
